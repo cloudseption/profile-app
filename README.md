@@ -2,7 +2,6 @@
 
 A full stack web application using React, Node.js, Express and Webpack. Configured with webpack-dev-server, eslint, prettier and babel.
 
-- [simple-react-full-stack](#simple-react-full-stack)
   - [Quick Start](#quick-start)
     - [Development mode](#development-mode)
     - [Production mode](#production-mode)
