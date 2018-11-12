@@ -20,7 +20,7 @@ A full stack web application using React, Node.js, Express and Webpack. Configur
 
 ```bash
 # Clone the repository
-git clone REPO-NAME
+git clone https://github.com/cloudseption/profile-app.git
 
 # Go inside the directory
 cd profile-app
