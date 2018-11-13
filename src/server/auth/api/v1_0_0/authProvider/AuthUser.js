@@ -11,6 +11,14 @@ function AuthUser() {
     this.hasGrantedAccessTo = (app) => {
         return Boolean(this.grants[app.appId]);
     };
+
+    this.getJwtPayload = () => {
+        return {
+            sub: this.uuid,
+            iat: Date.now(),
+            exp: Date.now() + this.authProvider.TOKEN_LIFESPAN
+        };
+    };
 }
 
 AuthUser.fromJson = (json) => {

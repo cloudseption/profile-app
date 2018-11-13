@@ -5,6 +5,7 @@ $(function () {
     };
     let userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     let authToken = new Promise(function fetchCurrentAuthToken(resolve, reject) {
+        console.log('Fetching cognito token');
         let cognitoUser = userPool.getCurrentUser();
 
         if (cognitoUser) {
@@ -23,6 +24,7 @@ $(function () {
     });
 
     authToken.then(function setAuthToken(token) {
+        console.log('Making sure token exists');
         if (token) {
             return token;
         } else {
@@ -31,6 +33,7 @@ $(function () {
         }
     })
     .then(function getSignedAccessTokenFromServer(authToken) {
+        console.log('Requesting signed access token');
         const appKey = (new URLSearchParams(document.location.search)).get('clientappkey');
         const url = `${window.location.origin}/auth/api/1.0.0/token`;
         const headers = new Headers([
@@ -44,31 +47,40 @@ $(function () {
         });
     })
     .then(function verifyResponse(response) {
-        if (response) {
+        console.log('Verifying response');
+        console.log(response);
+        try {
             return response.json();
+        } catch (err) {
+            console.log(response);
+            throw err;
         }
-        throw new Error('invalid response returned');
     })
     .then(function returnUserViaRedirect(jsonResponse) {
-        let accessToken = jsonResponse.accesstoken;
-        console.log(accessToken);
-        let tokenParam = `token=${accessToken}`;
-        
-        let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
-        if (!redirect64) {
-            throw new Error('No redirect URL supplied');
-        }
-        let redirect = atob(redirect64);
-
-        if (redirect.indexOf('?') < 0) {
-            redirect += '?' + tokenParam;
+        if (jsonResponse.error) {
+            console.log(jsonResponse.error);
         } else {
-            redirect += '&' + tokenParam;
+            console.log('Triggering redirect');
+            let accessToken = jsonResponse.accesstoken;
+            console.log(accessToken);
+            let tokenParam = `token=${accessToken}`;
+            
+            let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
+            if (!redirect64) {
+                throw new Error('No redirect URL supplied');
+            }
+            let redirect = atob(redirect64);
+
+            if (redirect.indexOf('?') < 0) {
+                redirect += '?' + tokenParam;
+            } else {
+                redirect += '&' + tokenParam;
+            }
+
+            console.log(redirect);
+
+            window.location = redirect;
         }
-
-        console.log(redirect);
-
-        window.location = redirect;
     })
     .catch(function handleTokenError(error) {
         console.log('Error', error);

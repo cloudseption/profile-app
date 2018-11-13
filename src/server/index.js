@@ -7,6 +7,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const dotenv = require("dotenv").config();
 
+const authProviderSingleton = require('./auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
+authProviderSingleton.config = require('./auth/api/v1_0_0/config');
+authProviderSingleton.init();
+
 const port = process.env.PORT || 8080;
 
 const userRoutes = require('./api/routes/users');

@@ -19,6 +19,7 @@ function AuthProvider(keystore, cognitoExpress) {
     this.clientApps         = {};
     this.validScopes        = [];
     this.scopeDisplayNames  = [];
+    this.TOKEN_LIFESPAN;
 
     /**
      * Returns a boolean that indicates whether or not the given user has
@@ -107,6 +108,31 @@ function AuthProvider(keystore, cognitoExpress) {
     };
 
     /**
+     * 
+     */
+    this.getAccessToken = (user, app) => {
+        let jwtPayload = user.getJwtPayload();
+        let secret = this.keystore.get(app.jwk);
+
+        return jose.JWS.createSign(
+            {
+                fields: {
+                    alg: 'HS256',
+                    typ: 'jwt'
+                },
+                format: 'compact' },
+            {
+                key: secret
+            }
+        )
+        .update(JSON.stringify(jwtPayload))
+        .final()
+        .then(jws => {
+            return jws;
+        });
+    };
+
+    /**
      * Main app onboarding function. Registers a client app and initializes its
      * JWK with the keystore. Fails if the app isn't a valid ClientApp (you
      * need to make a new one using .fromJson() first) or if any of the desired
@@ -134,7 +160,7 @@ function AuthProvider(keystore, cognitoExpress) {
 
             // Create the app's JWK from its json and import it into the keystore.
             if (app.jwk) {
-                awakeystore.add(app.jwk, 'json')
+                keystore.add(app.jwk, 'json')
                 .then((jwk) => {
                     app.jwk = jwk;
                     resolve();
@@ -199,18 +225,22 @@ function AuthProvider(keystore, cognitoExpress) {
      * token invalid or user not registered.
      */
     this.getUserByCognitoToken = async (token) => {
-        let userJwt = await new Promise((resolve, reject) => {
-            cognitoExpress.validate(
-                token,
-                function generateAppAccessToken(err, jwt) {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            cognitoExpress.validate(token,
+                (err, jwt) => {
                     if (err) {
                         reject(new Error('Error validating cognito token'));
                     }
-                    resolve(jwt);
+
+                    try {
+                        let user = self.getUserByCognitoJwt(jwt);
+                        resolve(user);
+                    } catch (err) {
+                        reject(err.message);
+                    }
                 });
             });
-        
-        console.log(jwt);
     };
 
     /**
@@ -218,7 +248,7 @@ function AuthProvider(keystore, cognitoExpress) {
      * token invalid or user not registered.
      */
     this.getUserByCognitoJwt = (jwt) => {
-        let uuid = jwt.sub;
+        let uuid = jwt.sub.trim();
 
         if (this.authUsers[uuid]) {
             return this.authUsers[uuid];
@@ -232,7 +262,14 @@ function AuthProvider(keystore, cognitoExpress) {
      * Returns the app mapped to the given public key.
      */
     this.getClientAppByPublicKey = (kid) => {
-        return Object.values(this.clientApps).find(app => app.jwk.kid == kid);
+        let app = Object.values(this.clientApps).find(app => {
+            return app.jwk.kid == kid;
+        });
+        if (!app) {
+            throw new Error(`${this.constructor.name} #getClientAppByPublicKey: `
+            + `no app registered with KID ${kid}`);
+        }
+        return app;
     };
 
     /**
@@ -252,6 +289,7 @@ AuthProvider.fromJson = async (config) => {
 
     if (config.scopes) {
         config.scopes.forEach(scope => {
+            console.log(`AuthProvider: Registering scope ${scope[0]}`);
             authProvider.registerScope(scope[0], scope[1]);
         });
     }
@@ -260,6 +298,7 @@ AuthProvider.fromJson = async (config) => {
         for (let i=0; i < config.clientApps.length; i++) {
             let clientAppJson = config.clientApps[i];
             let clientApp = ClientApp.fromJson(clientAppJson);
+            console.log(`AuthProvider: Registering client app ${clientApp.appId}`);
             await authProvider.registerClientApp(clientApp);
         }
     }
@@ -268,8 +307,13 @@ AuthProvider.fromJson = async (config) => {
         for (let i=0; i < config.authUsers.length; i++) {
             let authUserJson = config.authUsers[i];
             let authUser = AuthUser.fromJson(authUserJson);
+            console.log(`AuthProvider: Registering auth user ${authUser.uuid}`);
             await authProvider.registerAuthUser(authUser);
         }
+    }
+
+    if (config.TOKEN_LIFESPAN) {
+        authProvider.TOKEN_LIFESPAN = config.TOKEN_LIFESPAN;
     }
 
     return authProvider;
@@ -282,16 +326,16 @@ AuthProvider.fromJson = async (config) => {
  * Singleton, so we maintain the same data model for the whole app.
  */
 const AuthProviderSingleton = new (function AuthProviderSingleton() {
-    let config;
+    this.config;
     let instance;
+
+    this.init = async () => {
+        instance = await AuthProvider.fromJson(this.config);
+    };
 
     this.getInstance = () => {
         if (!instance) {
-            if (!config) {
-                this.refreshInstance();
-            } else {
-                instance = AuthProvider.fromJson(config);
-            }
+            this.init();
         }
         return instance;
     };

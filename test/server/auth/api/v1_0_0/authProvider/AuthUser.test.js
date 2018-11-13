@@ -35,8 +35,6 @@ describe('AuthUser', function() {
             let clientApp = ClientApp.fromJson(mockAppData);
             let authUser = AuthUser.fromJson(mockUserData);
 
-            console.log(authUser);
-
             assert(authUser.hasGrantedAccessTo(clientApp) === false);
         });
 

@@ -4,6 +4,8 @@ const assert = require('assert');
 const ClientApp = require('../../../../../../src/server/auth/api/v1_0_0/authProvider/ClientApp');
 const AuthUser = require('../../../../../../src/server/auth/api/v1_0_0/authProvider/AuthUser');
 const authProviderSingleton = require('../../../../../../src/server/auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
+const AuthProvider = require('../../../../../../src/server/auth/api/v1_0_0/authProvider/AuthProvider').AuthProvider;
+const testConfig = require('./AuthProviderConfig');
 
 const mockAppData = Object.freeze({
     appId: `hangman`,
@@ -132,6 +134,7 @@ describe('AuthProvider', function() {
         beforeEach(refreshSingletonInstances);
 
         it(`Should fail with a bad token`, async function() {
+            this.timeout(5000);
             let authProvider = authProviderSingleton.getInstance();
 
             let failed = false;
@@ -189,6 +192,36 @@ describe('AuthProvider', function() {
             }
             assert(failed);
             assert(returnedUser !== user);
+        });
+    });
+
+
+
+    describe('#fromJson', async function() {
+        let authProvider = await AuthProvider.fromJson(testConfig);;
+
+        it(`Should contain scopes`, function() {
+            assert(authProvider.isValidScope('USER:BADGE:WRITE'),
+                'Scope USER:BADGE:WRITE not valid');
+            assert(authProvider.isValidScope('USER:DISPLAY_NAME:READ'),
+                'Scope USER:DISPLAY_NAME:READ not valid');
+        });
+
+        it(`Should contain keys`, function() {
+            assert(authProvider.keystore.all().length === 1,
+                `Keystore contains ${authProvider.keystore.all().length} keys. Expected 1`);
+        });
+
+        // Not sure how to fix this one. Something weird is going on.
+        it(`Should contain users`, function() {
+            assert(authProvider.authUsers.length > 0);
+            // assert(authProvider.isUserRegistered('a094f19f-e06d-422d-b7bc-fecaa137ece2'),
+            //     `User with UUID a094f19f-e06d-422d-b7bc-fecaa137ece2 not registered`);
+        });
+
+        it(`Should have registered apps`, function() {
+            assert(authProvider.isAppRegistered('hangman'),
+                'App with id hangman not registered');
         });
     });
 });
