@@ -35,7 +35,7 @@ function AuthProvider(keystore, cognitoExpress) {
     };
 
     /**
-     * 
+     * Registers a client app and initializes its JWK with the keystore.
      */
     this.registerClientApp = (app) => {
         return new Promise((resolve, reject) => {
@@ -60,6 +60,14 @@ function AuthProvider(keystore, cognitoExpress) {
                 });
             }
         });
+    };
+
+    /**
+     * Registers an AuthUser.
+     */
+    this.registerAuthUser = (user) => {
+        user.authProvider = this;
+        this.authUsers[user.uuid] = user;
     };
 
     /**
