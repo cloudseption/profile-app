@@ -2,6 +2,7 @@ const jose = require('node-jose');
 const CognitoExpress = require('cognito-express');
 
 const ClientApp = require('./ClientApp');
+const AuthUser = require('./AuthUser');
 
 
 
@@ -17,11 +18,16 @@ function AuthProvider(keystore, cognitoExpress) {
     this.authUsers          = {};
     this.clientApps         = {};
     this.validScopes        = [];
+    this.scopeDisplayNames  = [];
 
     /**
      * Returns a boolean that indicates whether or not the given user has
      * granted the given app permission to access the given scope on their
      * account.
+     * 
+     * @param {string | ClientApp} app A ClientApp or a string with the appId.
+     * @param {string | AuthUser} user An AuthUser or a string with the uuid.
+     * @param {string} scope String containing desired scope.
      */
     this.isAppUserScopePermitted = (app, user, scope) => {
         if (typeof app === 'string') {
@@ -39,9 +45,74 @@ function AuthProvider(keystore, cognitoExpress) {
     };
 
     /**
-     * Registers a client app and initializes its JWK with the keystore.
+     * Returns true if given user has granted permissions to the given app (if
+     * a user has granted permissions to the app, they are obviously enrolled
+     * in it).
+     * 
+     * @param {string | ClientApp} app A ClientApp or a string with the appId.
+     * @param {string | AuthUser} user An AuthUser or a string with the uuid.
      */
-    this.registerClientApp = (app) => {
+    this.hasUserEnrolledInApp = (user, app) => {
+        if (typeof app === 'string') {
+            app = this.getClientAppByAppId(app);
+        }
+
+        if (typeof user === 'string') {
+            user = this.getUserByUuid(user);
+        }
+
+        return (this.isAppRegistered()
+            && this.isUserRegistered()
+            && user.hasGrantedAccessTo(app));
+    };
+
+    /**
+     * Enrolls the user in the given app (grants permissions to it).
+     * 
+     * @param {string | ClientApp} app A ClientApp or a string with the appId.
+     * @param {string | AuthUser} user An AuthUser or a string with the uuid.
+     */
+    this.enrollUserInApp = (user, app) => {
+        if (typeof app === 'string') {
+            app = this.getClientAppByAppId(app);
+        }
+
+        if (typeof user === 'string') {
+            user = this.getUserByUuid(user);
+        }
+
+        user.grantPermissionToApp(app);
+    };
+
+    /**
+     * Returns the metadata associated with the app.
+     * 
+     * @param {string | ClientApp} app A ClientApp or a string with the appId.
+     */
+    this.getAppMetadata = (app) => {
+        if (typeof app === 'string') {
+            app = this.getClientAppByAppId(app);
+        }
+
+        let metadata = app.getMetadata();
+        let scopeNames = [];
+
+        metadata.scopes.forEach(scope => {
+            let scopeIndex = this.validScopes.indexOf(scope);
+            scopeNames.push(this.scopeDisplayNames[scopeIndex]);
+        });
+        metadata.scopes = scopeNames;
+
+        return metadata;
+    };
+
+    /**
+     * Main app onboarding function. Registers a client app and initializes its
+     * JWK with the keystore. Fails if the app isn't a valid ClientApp (you
+     * need to make a new one using .fromJson() first) or if any of the desired
+     * scopes aren't yet registered.
+     */
+    this.registerClientApp = async (app) => {
         return new Promise((resolve, reject) => {
             if (!(app instanceof ClientApp)) {
                 throw new Error(`${this.constructor.name} #onboardClientApp: `
@@ -63,7 +134,7 @@ function AuthProvider(keystore, cognitoExpress) {
 
             // Create the app's JWK from its json and import it into the keystore.
             if (app.jwk) {
-                keystore.add(app.jwk, 'json')
+                awakeystore.add(app.jwk, 'json')
                 .then((jwk) => {
                     app.jwk = jwk;
                     resolve();
@@ -83,13 +154,17 @@ function AuthProvider(keystore, cognitoExpress) {
     /**
      * Registers a scope.
      */
-    this.registerScope = (scope) => {
+    this.registerScope = (scope, scopeName) => {
         if (typeof scope !== 'string') {
             throw new Error(`Valid permissions must be strings, but you passed ${typeof scope}`);
         }
         this.validScopes.push(scope);
+        this.scopeDisplayNames.push(scopeName);
     };
 
+    /**
+     * Returns true if the provided app is registered.
+     */
     this.isAppRegistered = (app) => {
         if (app instanceof ClientApp) {
             app = app.appId;
@@ -112,6 +187,9 @@ function AuthProvider(keystore, cognitoExpress) {
         return this.authUsers[uuid];
     };
 
+    /**
+     * Returns true if the provided user is registered with the auth provider.
+     */
     this.isUserRegistered = (user) => {
         return Boolean(this.authUsers[user.uuid]);
     };
@@ -167,19 +245,63 @@ function AuthProvider(keystore, cognitoExpress) {
 
 
 
+AuthProvider.fromJson = async (config) => {
+    let cognitoExpress = new CognitoExpress(config.cognitoExpress);
+    let keystore = jose.JWK.createKeyStore();
+    let authProvider = new AuthProvider(keystore, cognitoExpress);
+
+    if (config.scopes) {
+        config.scopes.forEach(scope => {
+            authProvider.registerScope(scope[0], scope[1]);
+        });
+    }
+
+    if (config.clientApps) {
+        for (let i=0; i < config.clientApps.length; i++) {
+            let clientAppJson = config.clientApps[i];
+            let clientApp = ClientApp.fromJson(clientAppJson);
+            await authProvider.registerClientApp(clientApp);
+        }
+    }
+
+    if (config.authUsers) {
+        for (let i=0; i < config.authUsers.length; i++) {
+            let authUserJson = config.authUsers[i];
+            let authUser = AuthUser.fromJson(authUserJson);
+            await authProvider.registerAuthUser(authUser);
+        }
+    }
+
+    return authProvider;
+};
+
+
+
+
 /**
  * Singleton, so we maintain the same data model for the whole app.
  */
 const AuthProviderSingleton = new (function AuthProviderSingleton() {
+    let config;
     let instance;
 
     this.getInstance = () => {
         if (!instance) {
-            this.refreshInstance();
+            if (!config) {
+                this.refreshInstance();
+            } else {
+                instance = AuthProvider.fromJson(config);
+            }
         }
         return instance;
     };
 
+    /**
+     * DON'T USE THIS IN PRODUCTION!!!
+     * 
+     * Provided so my tests actually work, because mocha doesn't reload modules
+     * between each one.
+     */
     this.refreshInstance = () => {
         // Cognito Configuration (TODO: Move this somewhere external)
         let defaultCognitoExpress = new CognitoExpress({
