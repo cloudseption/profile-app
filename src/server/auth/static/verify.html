@@ -1,0 +1,45 @@
+<html> 
+    <head>
+        <link rel="shortcut icon" type="image/png" href="img/Hangman_Icon.png"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body>
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <h3>Account Verified!</h3>
+                <h4>You can now sign in with these credentials</h4>
+                <button id="ok_button" class="btn btn-success">OK</button>
+            </div>
+        </div>
+        <div class="fluff_container">
+            <div id="desktop_banner">
+            </div>
+        </div>
+        <div class="auth_container">
+            <div class="signin-form-container">
+                <div id="mobile_banner">
+                </div>
+                <section class="form-wrap">
+                    <h1>Verify Email</h1>
+                    <form id="verifyForm">
+                        <input type="email" id="emailInputVerify" class="form-control auth-input" placeholder="Email" required>
+                        <input type="text" id="codeInputVerify" class="form-control auth-input" placeholder="Verification Code" pattern=".*" required>
+                        <h4 id="verify_error_message" class="error_message text-danger">User Already Verified</h4>
+                        <h4 id="error_message" class="error_message text-danger"></h4>
+                        <button id="verify_button" type="submit" class="btn btn-info">Verify</button>
+                    </form>
+                </section>
+            </div>
+        </div>
+        <script src="js/strings.js"></script>
+        <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+        <script src="js/event_dispatcher.js"></script>
+        <script src="js/auth/config.js"></script>
+        <script src="js/model/verify_model.js"></script>
+        <script src="js/view/verify_view.js"></script>
+        <script src="js/controller/verify_controller.js"></script>
+        <script src="js/register_app.js"></script>
+        <script src="js/auth/amazon-cognito-identity.min.js"></script>
+    </body>
+</html>

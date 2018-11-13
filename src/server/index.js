@@ -1,10 +1,12 @@
 const express = require('express');
 const os = require('os');
+const auth = require('./auth/router');
 
 const port = process.env.PORT || 8080;
 const app = express();
 
 app.use(express.static('dist'));
+app.use('/auth', auth);
 
 app.get('/api/hello', (req, res) => {
   res.send({ express: 'Hello From Express' });

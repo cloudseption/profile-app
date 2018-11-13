@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>Register</title>
+        <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+        <link rel="shortcut icon" type="image/png" href="img/Hangman_Icon.png"/>
+    </head>
+    <body>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <h4>An email containing your verification code will be sent to this email address shortly</h4>
+                <h4>Please enter this code on the following page to verify your account</h4>
+                <button id="ok_button" class="btn btn-success">OK</button>
+            </div>
+        </div>
+        <div class="fluff_container">
+            <div id="desktop_banner">
+            </div>
+        </div>
+        <div class="auth_container">
+            <div class="signin-form-container">
+                <div id="mobile_banner">
+                </div>
+                <section class="form-wrap">
+                    <h2>Register</h2>
+                    <form id="registrationForm">
+                        <input type="email" id="emailInputRegister" class="form-control auth-input" placeholder="Email" pattern=".*">
+                        <input type="password" id="passwordInputRegister" class="form-control auth-input" placeholder="Password" pattern=".*" >
+                        <input type="password" id="password2InputRegister" class="form-control auth-input" placeholder="Confirm Password" pattern=".*" >
+                        <h4 id="error_message" class="error_message text-danger"></h4>
+                        <button id="register_button" class="btn btn-info">Register</button>
+                </form>
+                </section>
+                <p>Paswords must contain at least 8 characters, with at least one uppercase, one lowercase, one digit, and one special character</p>
+
+                <div>
+                </div>
+            </div>
+        </div>
+        <script src="js/strings.js"></script>
+        <script src="js/event_dispatcher.js"></script>
+        <script src="js/auth/config.js"></script>
+        <script src="js/model/register_model.js"></script>
+        <script src="js/view/register_view.js"></script>
+        <script src="js/controller/register_controller.js"></script>
+        <script src="js/register_app.js"></script>
+        <script src="js/auth/amazon-cognito-identity.min.js"></script>
+
+        <!-- <script src="js/auth/cognito-auth.js"></script> -->
+    </body>
+</html>
