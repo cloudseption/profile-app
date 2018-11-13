@@ -27,9 +27,14 @@ function ClientApp() {
 }
 
 ClientApp.fromJson = (json) => {
-    let jsonCopy = JSON.parse(JSON.stringify(json))
-    ClientApp.call(jsonCopy);
-    return jsonCopy;
+    let instance = new ClientApp();
+    let jsonCopy = JSON.parse(JSON.stringify(json));
+    Object.keys(jsonCopy).forEach(key => {
+        if (jsonCopy[key]) {
+            instance[key] = jsonCopy[key];
+        }
+    });
+    return instance;
 };
 
 module.exports = ClientApp;

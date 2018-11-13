@@ -14,13 +14,14 @@ function AuthUser() {
 }
 
 AuthUser.fromJson = (json) => {
-    let authUser = new AuthUser();
-    Object.keys(json).forEach(key => {
-        if (json.key) {
-            authUser[key] = json.key;
+    let instance = new AuthUser();
+    let jsonCopy = JSON.parse(JSON.stringify(json));
+    Object.keys(jsonCopy).forEach(key => {
+        if (jsonCopy[key]) {
+            instance[key] = jsonCopy[key];
         }
     });
-    return authUser;
+    return instance;
 };
 
 module.exports = AuthUser;
