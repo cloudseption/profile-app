@@ -63,7 +63,7 @@ $(function () {
         else if (jsonResponse.notice === 'NEED_PERMISSION') {
             console.log("need permissions");
             let redirect = btoa(window.location);
-            window.location.href = `request_permissions.html?redirect=${redirect}&appId=${jsonResponse.appId}`;
+            window.location.href = `permission.html?redirect=${redirect}&appId=${jsonResponse.appId}`;
         }
         else {
             console.log('Triggering redirect');

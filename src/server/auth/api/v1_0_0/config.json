@@ -18,7 +18,7 @@
             },
             "appId": "hangman",
             "displayName": "Hangman",
-            "appUrl": "www.example.com",
+            "appUrl": "https://www.justinheidema.com/",
             "scopes": [
                 "USER:BADGE:WRITE",
                 "USER:DISPLAY_NAME:READ"
