@@ -70,6 +70,7 @@ describe('AuthProvider', function() {
             });
 
             authProvider.registerClientApp(app);
+            authProvider.registerAuthUser(user);
             user.grantPermissionToApp(app)
 
             assert(authProvider.isAppUserScopePermitted(app, user, scope) === true);
@@ -82,6 +83,7 @@ describe('AuthProvider', function() {
             let authProvider = authProviderSingleton.getInstance();
             let scope = mockAppData.scopes[0];
 
+            authProvider.registerAuthUser(user);
             user.grantPermissionToApp(app)
 
             assert(authProvider.isAppUserScopePermitted(app, user, scope) === false);
@@ -94,13 +96,99 @@ describe('AuthProvider', function() {
             let authProvider = authProviderSingleton.getInstance();
             let scope = mockAppData.scopes[0];
 
-            // Register scopes
             authProvider.registerScope(mockAppData.scopes[1]);
+            authProvider.registerAuthUser(user);
+            authProvider.registerClientApp(app)
+            .catch(err => {
+                // Doesn't really matter. App shouldn't really register.
+            });
 
-            authProvider.registerClientApp(app);
             user.grantPermissionToApp(app)
 
             assert(authProvider.isAppUserScopePermitted(app, user, scope) === false);
+        });
+
+
+        it(`Should fail if user didn't grant permission to app`, function() {
+            let app = ClientApp.fromJson(mockAppData);
+            let user = AuthUser.fromJson(mockUserData);
+            let authProvider = authProviderSingleton.getInstance();
+            let scope = mockAppData.scopes[0];
+
+            // Register scopes
+            mockAppData.scopes.forEach(scope => {
+                authProvider.registerScope(scope);
+            });
+
+            authProvider.registerAuthUser(user);
+            authProvider.registerClientApp(app);
+
+            assert(authProvider.isAppUserScopePermitted(app, user, scope) === false);
+        });
+    });
+
+
+    describe('#getUserByCognitoToken', function() {
+        beforeEach(refreshSingletonInstances);
+
+        it(`Should fail with a bad token`, async function() {
+            let authProvider = authProviderSingleton.getInstance();
+
+            let failed = false;
+            try {
+                let user = await authProvider.getUserByCognitoToken('badtoken');
+            } catch (err) {
+                failed = true;
+            }
+            assert(failed);
+        });
+    });
+
+
+
+    describe('#getUserByCognitoJwt', function() {
+        beforeEach(refreshSingletonInstances);
+
+        it(`Should work if JWT UUID is registered`, async function() {
+            let user = AuthUser.fromJson(mockUserData);
+            let authProvider = authProviderSingleton.getInstance();
+
+            authProvider.registerAuthUser(user);
+
+            const dummyJwt = {
+                sub: mockUserData.uuid
+            };
+
+            let failed = false;
+            let returnedUser;
+            try {
+                returnedUser = authProvider.getUserByCognitoJwt(dummyJwt);
+            } catch (err) {
+                failed = true;
+            }
+            assert(failed === false);
+            assert(returnedUser === user);
+        });
+
+        it(`Should throw error if JWT UUID is registered`, async function() {
+            let user = AuthUser.fromJson(mockUserData);
+            let authProvider = authProviderSingleton.getInstance();
+
+            authProvider.registerAuthUser(user);
+
+            const dummyJwt = {
+                sub: 'some-other-value'
+            };
+
+            let failed = false;
+            let returnedUser;
+            try {
+                returnedUser = authProvider.getUserByCognitoJwt(dummyJwt);
+            } catch (err) {
+                failed = true;
+            }
+            assert(failed);
+            assert(returnedUser !== user);
         });
     });
 });

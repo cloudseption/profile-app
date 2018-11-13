@@ -33,6 +33,7 @@ function AuthProvider(keystore, cognitoExpress) {
         }
 
         return (this.isAppRegistered(app)
+            && this.isUserRegistered(user)
             && this.isValidScope(scope)
             && user.hasGrantedAccessTo(app));
     };
@@ -109,6 +110,44 @@ function AuthProvider(keystore, cognitoExpress) {
      */
     this.getUserByUuid = (uuid) => {
         return this.authUsers[uuid];
+    };
+
+    this.isUserRegistered = (user) => {
+        return Boolean(this.authUsers[user.uuid]);
+    };
+
+    /**
+     * Returns the user associated with the cognito token; throws an error if
+     * token invalid or user not registered.
+     */
+    this.getUserByCognitoToken = async (token) => {
+        let userJwt = await new Promise((resolve, reject) => {
+            cognitoExpress.validate(
+                token,
+                function generateAppAccessToken(err, jwt) {
+                    if (err) {
+                        reject(new Error('Error validating cognito token'));
+                    }
+                    resolve(jwt);
+                });
+            });
+        
+        console.log(jwt);
+    };
+
+    /**
+     * Returns the user associated with the cognito token; throws an error if
+     * token invalid or user not registered.
+     */
+    this.getUserByCognitoJwt = (jwt) => {
+        let uuid = jwt.sub;
+
+        if (this.authUsers[uuid]) {
+            return this.authUsers[uuid];
+        } else {
+            throw new Error(`${this.constructor.name} #getUserByCognitoJwt: `
+            + `No user registered with UUID ${uuid}`);
+        }
     };
 
     /**
