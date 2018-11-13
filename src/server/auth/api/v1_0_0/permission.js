@@ -1,15 +1,11 @@
 const AuthProviderSingleton = require('./authProvider/AuthProvider').AuthProviderSingleton;
 
 const get = async function getPermission(req, res) {
-    console.log('GET PERMISSIONS');
     let authProvider = await AuthProviderSingleton.getInstance();
-
-    console.log(req.params);
 
     try {
         let appId = req.params.appId;
         let metadata = JSON.stringify(authProvider.getAppMetadata(appId));
-        console.log(metadata);
         res.send(metadata);
     }
     catch (err) {
@@ -19,7 +15,21 @@ const get = async function getPermission(req, res) {
 };
 
 async function post(req, res) {
-    
+    let token           = req.headers.authorization;
+    let appId           = req.params.appId;
+
+    try {
+        let authProvider    = await AuthProviderSingleton.getInstance();
+        let user            = await authProvider.getUserByCognitoToken(token);
+        let app             = await authProvider.getClientAppByAppId(appId);
+        
+        await authProvider.enrollUserInApp(user, app);
+        res.send(JSON.stringify({ permission: 'GRANTED' }));
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send({ error: err.message});
+    }
 };
 
 module.exports = { get, post };

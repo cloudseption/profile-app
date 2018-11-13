@@ -61,9 +61,9 @@ function AuthProvider(keystore, cognitoExpress) {
         if (typeof user === 'string') {
             user = this.getUserByUuid(user);
         }
-
-        return (this.isAppRegistered()
-            && this.isUserRegistered()
+        
+        return (this.isAppRegistered(app)
+            && this.isUserRegistered(user)
             && user.hasGrantedAccessTo(app));
     };
 

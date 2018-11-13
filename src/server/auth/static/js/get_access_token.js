@@ -4,6 +4,10 @@ $(function () {
         ClientId: _config.cognito.userPoolClientId
     };
     let userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    let params = new URLSearchParams(document.location.search);
+    let permission = params.get('permission');
+
+
     let authToken = new Promise(function fetchCurrentAuthToken(resolve, reject) {
         console.log('Fetching cognito token');
         let cognitoUser = userPool.getCurrentUser();
@@ -34,17 +38,19 @@ $(function () {
     })
     .then(function getSignedAccessTokenFromServer(authToken) {
         console.log('Requesting signed access token');
-        const appKey = (new URLSearchParams(document.location.search)).get('clientappkey');
+        const appKey = (new URLSearchParams(document.location.search)).get('client_key');
         const url = `${window.location.origin}/auth/api/1.0.0/token`;
-        const headers = new Headers([
-            ['cognitoaccesstoken', authToken],
-            ['clientappkey', appKey]
-        ]);
 
-        return fetch(url, {
-            method: 'get',
-            headers: headers
-        });
+        console.log(authToken);
+
+        return fetch(url,
+            {
+                method: 'get',
+                headers: {
+                    authorization: authToken,
+                    client_key: appKey
+                }
+            });
     })
     .then(function verifyResponse(response) {
         console.log('Verifying response');
@@ -60,6 +66,9 @@ $(function () {
         if (jsonResponse.error) {
             console.log(jsonResponse.error);
         }
+        else if (permission && permission !== 'GRANTED') {
+            console.log("You didn't grant permission to the app")
+        }
         else if (jsonResponse.notice === 'NEED_PERMISSION') {
             console.log("need permissions");
             let redirect = btoa(window.location);
@@ -69,7 +78,7 @@ $(function () {
             console.log('Triggering redirect');
             let accessToken = jsonResponse.accesstoken;
             console.log(accessToken);
-            let tokenParam = `token=${accessToken}`;
+            let tokenParam = `token=${accessToken}&permission=${permission}`;
             
             let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
             if (!redirect64) {

@@ -1,6 +1,8 @@
 var View = function(model) {
     this.model = model;
-    this.register_event = new Event(this);
+    
+    this.grant_event = new Event(this);
+    this.deny_event = new Event(this);
 
     this.only_content_container = document.getElementById("only_content_container");
     this.permission_request_title = document.getElementById("permission_request_title");
@@ -19,6 +21,8 @@ View.prototype = {
     // Sets up handlers
     setup_handlers() {
         this.load_metadata_handler = this.display_permission_request.bind(this);
+        this.grant_handler = this.grant_permission.bind(this);
+        this.deny_handler = this.deny_permission.bind(this);
     },
 
     // Configures listeners
@@ -28,6 +32,8 @@ View.prototype = {
 
     // Initial rendering of page
     render: function() {
+        this.grant_button.onclick = this.grant_handler;
+        this.deny_button.onclick = this.deny_handler;
         // this.register_button_element.onclick = this.register_handler;
         // this.register_button_element.addEventListener("click", function(event){
         //     event.preventDefault();
@@ -40,7 +46,6 @@ View.prototype = {
     // Displays app metdata (name, permissions requested, etc.)
     display_permission_request: function(sender, data) {
         this.permission_request_title.innerHTML = `${data.displayName} needs permission to...`
-        console.log(data);
         this.client_app_name.innerHTML = data.displayName;
         this.client_app_homepage.innerHTML = data.appUrl;
         this.client_app_homepage.href = data.appUrl;
@@ -53,5 +58,15 @@ View.prototype = {
         });
 
         this.only_content_container.hidden = false;
-    }
+    },
+
+    // Forwards permission grant to controller
+    grant_permission: function() {
+        this.grant_event.notify();
+    },
+
+    // Forwards permission denial to controller
+    deny_permission: function() {
+        this.deny_event.notify();
+    },
 }
