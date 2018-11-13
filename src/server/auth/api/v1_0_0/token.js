@@ -10,6 +10,15 @@ const handleRequest = async function handleRequest(req, res) {
     try {
         let user = await authProvider.getUserByCognitoToken(cognitoToken);
         let client = await authProvider.getClientAppByPublicKey(req.headers.clientappkey);
+
+        let userHasEnrolled = await authProvider.hasUserEnrolledInApp(user, client);
+        if (!userHasEnrolled) {
+            res.send({
+                notice: 'NEED_PERMISSION',
+                appId: client.appId
+            });
+        }
+
         let token = await authProvider.getAccessToken(user, client);
     
         res.send({ accesstoken: token });

@@ -95,6 +95,10 @@ function AuthProvider(keystore, cognitoExpress) {
             app = this.getClientAppByAppId(app);
         }
 
+        if (!app) {
+            throw new Error(`${this.constructor.name} #getAppMetadata: app is not defined`);
+        }
+
         let metadata = app.getMetadata();
         let scopeNames = [];
 
