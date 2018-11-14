@@ -4,7 +4,7 @@ class Name extends Component {
 
   render() {
     console.log("NameProps", this.props)
-    return <div>{this.props.value}</div>;
+    return <div><h4>{this.props.value}</h4></div>;
   }
 }
 
