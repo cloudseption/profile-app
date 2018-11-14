@@ -30,6 +30,8 @@ npm install
 # Start development server
 npm run dev
 
+STOP HERE IF YOU'RE A DEVELOPER, THE NEXT STEPS ARE FOR DEPLOYMENT
+
 # Build for production
 npm run build
 
