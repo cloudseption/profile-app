@@ -1,4 +1,3 @@
 {
-  "watch": ["src/server/"],
-  "env": { "MONGO_ATLAS_PASSWORD": "badgebook-admin" }
+  "watch": ["src/server/"]
 }
