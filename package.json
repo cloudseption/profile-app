@@ -14,12 +14,15 @@
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "body-parser": "^1.18.3",
     "bootstrap": "^4.1.2",
     "cognito-express": "^2.0.12",
+    "dotenv": "^6.1.0",
     "esm": "^3.0.84",
     "express": "^4.16.3",
     "mongodb": "^3.1.9",
-    "mongoose": "^5.3.11",
+    "mongoose": "^5.3.12",
+    "morgan": "^1.9.1",
     "node-jose": "^1.1.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2"
