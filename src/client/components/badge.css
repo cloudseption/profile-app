@@ -1,0 +1,30 @@
+div.badge_frame.badge_frame {
+    overflow: hidden;
+    padding: 0;
+}
+
+.badge_list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.badge_list_element {
+    white-space: pre;
+    margin: 0.5em 0;
+    font-size: 0.9em;
+}
+
+.badge_link:link, .badge_link:visited, .badge_link:hover, .badge_link:link {
+    color: black;
+}
+
+.badge_image {
+    width: 1.5em;
+    margin-right: 0.5em;
+}
+
+.badge_text {
+    white-space: pre;
+}
+
