@@ -8,7 +8,9 @@
     "start": "npm run build && node src/server/index.js",
     "client": "webpack-dev-server --color --progress --mode development -d",
     "server": "nodemon -r esm --watch src/server --inspect src/server/index.js",
-    "dev": "concurrently --kill-others \"npm run server\" \"npm run client\""
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "heroku-preinstall": "npm install -g webpack",
+    "heroku-postinstall": "npm install --dev && webpack -p"
   },
   "author": "Sandeep Raveesh",
   "license": "ISC",
