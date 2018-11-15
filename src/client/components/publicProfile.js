@@ -43,7 +43,7 @@ class PublicProfile extends Component {
             </div>
             <div className="row">
               <div className="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9">
-                {/* <ProfilePicture url={this.state.profileUrl} /> */}
+                <ProfilePicture picture={this.props.profile.picture} />
               </div>
               <div className="col-8 col-sm-7 col-md-5 col-lg-4 col-xl-3 description_frame">
                 <BadgeFrame badgeData={this.state.badgeData} />
