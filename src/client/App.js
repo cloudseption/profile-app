@@ -24,13 +24,28 @@ export default class App extends Component {
         </main>
       </div>;
   }
+
+
   
-  handleGetProfile = userId => {
-    console.log("Event handler called", userId);
-    axios.get(`http://localhost:8080/users/${userId}`)
+  handleGetProfile = searchParams => {
+    console.log("Event handler called", searchParams);
+    axios
+      .get(
+        `https://guarded-retreat-70427.herokuapp.com/api/search?input=${searchParams}`
+      )
       .then(res => {
-        const profile = res.data;
-        this.setState({ profile })
+        try {
+          const profile = res.data[0]; // Just display the first result for now.
+          console.log("profile", profile);
+
+          if (profile) {
+            this.setState({ profile });
+          } else {
+            this.setState({ profile: {} });
+          }
+        } catch (e) {
+          console.log(e);
+        }
       });
   }
 }
