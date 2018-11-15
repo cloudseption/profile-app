@@ -2,22 +2,35 @@ import React, { Component } from 'react';
 import './app.css';
 import NavBar from './components/navbar';
 import PublicProfile from './components/publicProfile';
-export default class App extends Component {
-  state = { username: null };
+import axios from 'axios';
 
-  componentDidMount() {
-    fetch('/api/getUsername')
-      .then(res => res.json())
-      .then(user => this.setState({ username: user.username }));
+export default class App extends Component {
+  state = {
+    profile: {}
   }
 
+  // Use this for when a user is first logged in - Phase 2
+  // componentDidMount() {
+  //   fetch('/api/getProfile:{currentUserId}')
+  //     .then(res => res.json())
+  //     .then(user => this.setState({ profile }));
+  // }
+
   render() {
-    const { username } = this.state;
     return <div>
-        <NavBar />
+        <NavBar onGetProfile={this.handleGetProfile}/>
         <main className="container">
-          <PublicProfile username={this.state.username}/>
+          <PublicProfile profile={this.state.profile} />
         </main>
       </div>;
+  }
+  
+  handleGetProfile = userId => {
+    console.log("Event handler called", userId);
+    axios.get(`http://localhost:8080/users/${userId}`)
+      .then(res => {
+        const profile = res.data;
+        this.setState({ profile })
+      });
   }
 }
