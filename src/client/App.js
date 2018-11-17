@@ -18,7 +18,7 @@ export default class App extends Component {
   // Use this for when a user is first logged in - Phase 2
   componentDidMount() {
     try {
-      this.getCurrentCognitoUser();
+      this.loadCognitoUserJwt();
     } catch (err) {
       console.log(err);
     }
@@ -61,7 +61,18 @@ export default class App extends Component {
       });
   }
 
-  getCurrentCognitoUser = () => {
+  /*
+   * Retrieves the current user token from cognito (if any) and stores it in
+   * state.currentUserToken.
+   * 
+   * When making API requests that need to be authenticated, add
+   * this.state.currentUserToken.jwtToken to the authorization header.
+   * 
+   * To compare the current user to the current profile ID to determine
+   * editability, compare the current user ID to 
+   * this.state.currentUserToken.payload.sub
+   */
+  loadCognitoUserJwt = () => {
     let cognitoUser = userPool.getCurrentUser();
 
     if (cognitoUser) {
