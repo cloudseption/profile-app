@@ -16,6 +16,7 @@
   "author": "Sandeep Raveesh",
   "license": "ISC",
   "dependencies": {
+    "amazon-cognito-identity-js": "^3.0.3",
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.3",
