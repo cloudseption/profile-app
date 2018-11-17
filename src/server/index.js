@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const os = require('os');
 const auth = require('./auth/router');
+const apiRouter = require('./api/router');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
 
 // Routes to handle requests
 app.use('/auth', auth);
+app.use('/api', apiRouter);
 app.use('/users', userRoutes);
 
 app.get('/api/getUsername', (req, res) => { // Remove this once users api is connected to frontend
