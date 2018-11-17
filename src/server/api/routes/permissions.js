@@ -22,6 +22,10 @@ router.post('/:clientId/:resourceId', (req, res, next) => {
     let resourceId  = req.params.resourceId;
     let permissions = req.query.permission;
 
+    if (!Array.isArray(permissions)) {
+        permissions = [ permissions ];
+    }
+
     PermissionSet.find({clientId: clientId, resourceId: resourceId })
     .then(docs => {
         if (docs.length === 0) {
@@ -98,6 +102,7 @@ function saveNewPermissionSet(clientId, resourceId, permissions) {
 }
 
 function updatePermissionSet(permissionSet, permissions) {
+    console.log(permissions);
     permissions.forEach(permission => {
         permissionSet.permissions.addToSet( permission );
     })

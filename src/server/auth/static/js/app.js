@@ -25,6 +25,7 @@ $(function () {
     authToken.then(function setAuthToken(token) {
         if (token) {
             authToken = token;
+            window.localStorage.setItem('cognitoToken', token)
         } else {
             window.location.href = 'index.html';
         }

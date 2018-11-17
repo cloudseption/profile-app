@@ -8,6 +8,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const dotenv = require("dotenv").config();
 
+const securityFilter = require('./security/securityFilter');
+const cognitoTokenFilter = require('./security/cognitoTokenFilter');
+
 const authProviderSingleton = require('./auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
 authProviderSingleton.config = require('./auth/api/v1_0_0/config');
 authProviderSingleton.init();
@@ -21,9 +24,13 @@ mongoose.connect(
    "mongodb://badgebook-admin:" + process.env.MONGO_ATLAS_PASSWORD + "@badge-book-shard-00-00-7gbwk.mongodb.net:27017,badge-book-shard-00-01-7gbwk.mongodb.net:27017,badge-book-shard-00-02-7gbwk.mongodb.net:27017/test?ssl=true&replicaSet=badge-book-shard-0&authSource=admin&retryWrites=true"
 );
 
+securityFilter.registerTokenFilter(cognitoTokenFilter);
+securityFilter.registerPublicRoute('*:/api/permissions/*');
+
 // Middleware
-app.use(express.static('dist'));
 app.use(morgan('dev')); // Used for logging requests
+app.use(securityFilter);
+app.use(express.static('dist'));
 app.use(bodyParser.urlencoded({ extended: false })); // TODO: Remove, depreciated.
 app.use(bodyParser.json()); // TODO: Remove, depreciated.
 
