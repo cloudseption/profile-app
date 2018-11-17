@@ -1,80 +1,33 @@
-const jose = require('node-jose');
-const keystore = require('./authDataSingleton').keystore;
-const CognitoExpress = require('cognito-express');
+const AuthProviderSingleton = require('./authProvider/AuthProvider').AuthProviderSingleton;
 
-const cognitoExpress = new CognitoExpress({
-    region: 'us-west-2',
-    cognitoUserPoolId: 'us-west-2_eZyNHvuo4',
-    tokenUse: 'id'
-})
+const handleRequest = async function handleRequest(req, res) {
+    let authProvider = AuthProviderSingleton.getInstance();    
+    let cognitoToken = req.headers.authorization;
+    if (!cognitoToken) {
+        throw new Error('Access token missing from header');
+    }
 
-const TOKEN_LIFESPAN = 3600000;
+    try {
+        let user    = await authProvider.getUserByCognitoToken(cognitoToken);
+        let client  = await authProvider.getClientAppByPublicKey(req.headers.client_key);
 
-const handleRequest = function handleRequest(req, res) {
-    (new Promise(function validateCognitoToken(resolve, reject) {
-        let cognitoToken = req.headers.cognitoaccesstoken;
-        if (!cognitoToken) {
-            reject(new Error('Access token missing from header'));
-        }
-        cognitoExpress.validate(
-            cognitoToken,
-            function generateAppAccessToken(err, response) {
-                if (err) {
-                    reject(new Error('Error validating cognito token'));
-                }
-                resolve(response);
+        let userHasEnrolled = await authProvider.hasUserEnrolledInApp(user, client);
+        if (!userHasEnrolled) {
+            console.log(`User ${user && user.uuid ? user.uuid : user} not enrolled in app ${client.appId}`);
+            res.send({
+                notice: 'NEED_PERMISSION',
+                appId: client.appId
             });
-    }))
+        }
+        else {
+            let token = await authProvider.getAccessToken(user, client);
+            res.send({ accesstoken: token });
+        }
 
-
-    .then(function buildJwtPayload(cognitoResponse) {
-        return {
-            sub: cognitoResponse.sub,
-            email: cognitoResponse.email,
-            iat: Date.now(),
-            exp: Date.now() + TOKEN_LIFESPAN
-        };
-    })
-
-
-    .then(function getJwkForApp(jwtPayload) {
-        return {
-            payload: jwtPayload,
-            secret: keystore.get(req.headers.clientappkey)
-        };
-    })
-
-
-    .then(function signJwt(params) {
-        return jose.JWS.createSign(
-            {
-                fields: {
-                    alg: 'HS256',
-                    typ: 'jwt'
-                },
-                format: 'compact' },
-            {
-                key: params.secret
-            }
-        )
-        .update(JSON.stringify(params.payload))
-        .final()
-        .then(jws => {
-            console.log(jws);
-            return jws;
-        });
-    })
-
-
-    .then(function returnJws(jws) {
-        return res.send({ accesstoken: jws });
-    })
-    
-
-    .catch(err => {
+    } catch (err) {
         console.log(err);
-        return res.status(401).send(err.message);
-    });
+        res.status(401).send({ error: err.message });
+    }
 }
 
 module.exports = handleRequest;

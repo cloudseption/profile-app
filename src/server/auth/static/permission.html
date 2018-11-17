@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <title>BadgeBook Auth</title>
+        <link rel="shortcut icon" type="image/png" href="img/Hangman_Icon.png"/>
+        <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <div id="only_content_container" hidden>
+            <div id="only_content">
+                <h3 id="permission_request_title"></h3>
+                <div class="text-left">
+                    <br />
+                    <ul id="permission_list"></ul>
+                    <br />
+                </div>
+                    <p>
+                        Visit <span id="client_app_name"></span>'s website:<br />
+                        <a id="client_app_homepage" href=""></a>
+                    </p>
+                <button id="grant_button" class="btn btn-info">Grant</button>
+                <button id="deny_button" class="btn btn-info">Deny</button>
+            </div>
+        </div>
+        <script src="js/strings.js"></script>
+        <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+        <script src="js/event_dispatcher.js"></script>
+        <script src="js/auth/config.js"></script>
+        <script src="js/model/permission_model.js"></script>
+        <script src="js/view/permission_view.js"></script>
+        <script src="js/controller/permission_controller.js"></script>
+        <script src="js/auth/amazon-cognito-identity.min.js"></script>
+        <script src="js/permission_app.js"></script>
+    </body>
+</html>
