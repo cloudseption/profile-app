@@ -3,7 +3,8 @@ import './app.css';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import NavBar from './components/navbar';
 import PublicProfile from './components/publicProfile';
-import Home from './components/home'
+import Home from './components/home';
+import About from './components/about';
 import axios from 'axios';
 
 import cognitoConfig from './config/cognitoConfig';
@@ -31,8 +32,9 @@ export default class App extends Component {
         <NavBar onGetProfile={this.handleGetProfile} />
           <Switch>
             <Route path="/profile/:handle" component={PublicProfile} />
-            <Route path="/" component={Home} />
+            <Route path="/about" component={About} />
             <Route path="/home" component={Home} />
+            <Route path="/" component={Home} />
           </Switch>
         </div>
       </Router>;
