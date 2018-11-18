@@ -6,7 +6,7 @@ let cognitoExpress = new CognitoExpress({
     tokenUse: 'id'
 });
 
-function cognitoTokenFilter(req) {
+function cognitoTokenResolver(req) {
     return new Promise((resolve, reject) => {
         let token = req.cookies.cognitoToken || req.headers.authorization;
         cognitoExpress.validate(token, (err, jwt) => {
@@ -24,4 +24,4 @@ function cognitoTokenFilter(req) {
     });
 }
 
-module.exports = cognitoTokenFilter;
+module.exports = cognitoTokenResolver;
