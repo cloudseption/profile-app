@@ -24,16 +24,18 @@ mongoose.connect(
    "mongodb://badgebook-admin:" + process.env.MONGO_ATLAS_PASSWORD + "@badge-book-shard-00-00-7gbwk.mongodb.net:27017,badge-book-shard-00-01-7gbwk.mongodb.net:27017,badge-book-shard-00-02-7gbwk.mongodb.net:27017/test?ssl=true&replicaSet=badge-book-shard-0&authSource=admin&retryWrites=true"
 );
 
-securityFilter.registerTokenFilter(cognitoTokenFilter);
-securityFilter.registerPublicRoute('*:/api/permissions/*');
-securityFilter.registerPublicRoute('*:/auth/*');
-
 // Middleware
 app.use(morgan('dev')); // Used for logging requests
+
+// Set up security Filter
+securityFilter.registerTokenResolver(cognitoTokenFilter);
+securityFilter.registerPublicRoute('*:/api/permissions/*');
+securityFilter.registerPublicRoute('*:/auth/*');
+securityFilter.registerPublicRoute('*:/user/*');
+securityFilter.registerPublicRoute('*:/users/*');
 app.use(securityFilter);
+
 app.use(express.static('dist'));
-app.use(bodyParser.urlencoded({ extended: false })); // TODO: Remove, depreciated.
-app.use(bodyParser.json()); // TODO: Remove, depreciated.
 
 // Add CORS headers to request
 app.use((req, res, next) => {
@@ -50,10 +52,6 @@ app.use((req, res, next) => {
 app.use('/auth', auth);
 app.use('/api', apiRouter);
 app.use('/users', userRoutes);
-
-app.get('/api/getUsername', (req, res) => { // Remove this once users api is connected to frontend
-  res.send({ username: os.userInfo().username });
-});
 
 // Middleware to catch all errors
 app.use((req, res, next) => {
