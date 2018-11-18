@@ -11,7 +11,11 @@ var Controller = function(model, view, authToken) {
 
     this.poolData = {
         UserPoolId: _config.cognito.userPoolId,
-        ClientId: _config.cognito.userPoolClientId
+        ClientId: _config.cognito.userPoolClientId,
+        Storage: new AmazonCognitoIdentity.CookieStorage({
+            domain: document.location.hostname,
+            secure: false
+        })
     };
 
     this.userPool = new AmazonCognitoIdentity.CognitoUserPool(this.poolData);
@@ -33,6 +37,7 @@ Controller.prototype = {
 
     // Sign user in to cognito
     signin: function(email, password, onSuccess, onFailure) {
+        console.log('signing in');
         let authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
             Username: email,
             Password: password
@@ -40,7 +45,22 @@ Controller.prototype = {
 
         let cognitoUser = this.create_cognito_user(email);
         cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: onSuccess,
+            onSuccess: (tokens) => {
+                let idToken = tokens.idToken.jwtToken;
+
+                ((cname, cvalue, exdays) => {
+                    console.log('saving')
+                    let d = new Date();
+                    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                    let expires = "expires="+ d.toUTCString();
+                    let value = cvalue + ";" + expires + ";path=/"
+
+                    console.log(cname, value);
+
+                    document.cookie = cname + "=" + value;
+                })('cognitoToken', idToken, 365);
+                onSuccess();
+            },
             onFailure: onFailure
         });
     },

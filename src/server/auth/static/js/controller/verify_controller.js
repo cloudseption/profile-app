@@ -45,6 +45,20 @@ Controller.prototype = {
         } else {
             this.verify(args.email, args.code,
                 function verifySuccess(result) {
+                    let idToken = result.idToken.jwtToken;
+                    console.log(idToken);
+    
+                    ((cname, cvalue, exdays) => {
+                        console.log('saving')
+                        let d = new Date();
+                        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                        let expires = "expires="+ d.toUTCString();
+                        let value = cvalue + ";" + expires + ";path=/"
+    
+                        console.log(cname, value);
+    
+                        document.cookie = cname + "=" + value;
+                    })('cognitoToken', idToken, 365);
                     m.verify();
                 },
                 function verifyError(err) {
