@@ -11,7 +11,11 @@ var Controller = function(model, view, authToken) {
 
     this.poolData = {
         UserPoolId: _config.cognito.userPoolId,
-        ClientId: _config.cognito.userPoolClientId
+        ClientId: _config.cognito.userPoolClientId,
+        Storage: new AmazonCognitoIdentity.CookieStorage({
+            domain: document.location.hostname,
+            secure: false
+        })
     };
 
     this.userPool = new AmazonCognitoIdentity.CognitoUserPool(this.poolData);
@@ -33,6 +37,7 @@ Controller.prototype = {
 
     // Sign user in to cognito
     signin: function(email, password, onSuccess, onFailure) {
+        console.log('signing in');
         let authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
             Username: email,
             Password: password

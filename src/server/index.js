@@ -6,6 +6,7 @@ const apiRouter = require('./api/router');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
+const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv").config();
 
 const securityFilter = require('./security/securityFilter');
@@ -25,6 +26,7 @@ mongoose.connect(
 );
 
 // Middleware
+app.use(cookieParser());
 app.use(morgan('dev')); // Used for logging requests
 
 // Set up security Filter
