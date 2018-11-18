@@ -26,7 +26,7 @@ mongoose.connect(
 );
 
 // Middleware
-<<<<<<< HEAD
+app.use(cookieParser());
 app.use(morgan('dev')); // Used for logging requests
 
 // Set up security Filter
@@ -38,24 +38,6 @@ securityFilter.registerPublicRoute('*:/users/*');
 app.use(securityFilter);
 
 app.use(express.static('dist'));
-=======
-app.use(cookieParser());
-app.use(morgan('dev')); // Used for logging requests
-// Reflect the current cookie
-app.use(function reflectCognitoToken(req, res, next) {
-  let token = req.cookies.cognitoToken;
-  console.log(token);
-  res.cookie('cognitoToken', token, {
-      maxAge: 900000,
-      httpOnly: true
-  });
-  next();
-});
-
-app.use(express.static('dist'));
-app.use(bodyParser.urlencoded({ extended: false })); // TODO: Remove, depreciated.
-app.use(bodyParser.json()); // TODO: Remove, depreciated.
->>>>>>> Stash
 
 // Add CORS headers to request
 app.use((req, res, next) => {

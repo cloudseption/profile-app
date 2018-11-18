@@ -6,8 +6,9 @@ let cognitoExpress = new CognitoExpress({
     tokenUse: 'id'
 });
 
-function cognitoTokenFilter(token) {
+function cognitoTokenFilter(req) {
     return new Promise((resolve, reject) => {
+        let token = req.cookies.cognitoToken || req.headers.authorization;
         cognitoExpress.validate(token, (err, jwt) => {
             if (err) {
                 reject(`Invalid cognito token`);

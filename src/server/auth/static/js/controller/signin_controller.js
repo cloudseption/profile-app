@@ -45,22 +45,7 @@ Controller.prototype = {
 
         let cognitoUser = this.create_cognito_user(email);
         cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: (tokens) => {
-                let idToken = tokens.idToken.jwtToken;
-
-                ((cname, cvalue, exdays) => {
-                    console.log('saving')
-                    let d = new Date();
-                    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-                    let expires = "expires="+ d.toUTCString();
-                    let value = cvalue + ";" + expires + ";path=/"
-
-                    console.log(cname, value);
-
-                    document.cookie = cname + "=" + value;
-                })('cognitoToken', idToken, 365);
-                onSuccess();
-            },
+            onSuccess: onSuccess,
             onFailure: onFailure
         });
     },

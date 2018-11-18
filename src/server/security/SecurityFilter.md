@@ -5,8 +5,8 @@ incoming requests to express.
 ## Filtering Steps
 The SecurityFilter goes through the following steps:
 
-1. Extract the client ID from whatever token is placed in the `authorization`
-header (see [Token Resolvers](#token-resolvers)).
+1. Extract the client ID from the request object (see
+[Token Resolvers](#token-resolvers)).
 2. Extract the resource ID by running the request object through any attached 
 [Resource Resolvers](#resource-resolvers).
 3. Use this pair to retrieve any relevant [permissions](#permissions) from our
@@ -27,13 +27,13 @@ they return. You shouldn't really be passing multiple resource IDs anyway
 of.
 
 ## Token Resolvers
-Token Resolvers are functions whose job is to extract a client ID from a
-specific type of token. They should return the extracted client ID if they were
-successful, or a falsey value if they weren't.
+Token Resolvers are functions whose job is to extract a client ID from an
+ExpressJS request object. They should return the extracted client ID if they
+were successful, or a falsey value if they weren't.
 
 **Prototype**
 ```
-function MyTokenFilter(token) {
+function MyTokenFilter(req) {
     ...
 }
 ```
@@ -42,6 +42,11 @@ function MyTokenFilter(token) {
 ```
 securityFilter.registerTokenResolver(cognitoTokenFilter);
 ```
+
+In general, Tokens will either come from cookies, or the `authorization` header.
+The main react site is set up to store its cognito token in cookies, as this
+ensures it gets sent with every request. However, for inter-app communication,
+it's probably better to use the header.
 
 ## Resource Resolvers
 Resource resolvers work similarly to [token resolvers](#token-resolvers). Their

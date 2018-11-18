@@ -18,8 +18,7 @@ async function securityFilter(req, res, next) {
     req.permissions = [];
 
     try {
-        let clientToken = req.headers.authorization;
-        let clientId    = await getClientIdFromToken(clientToken);
+        let clientId    = await getClientIdFromToken(req);
         req.clientId    = clientId;
 
         let resourceId  = await getResourceId(req);
@@ -79,13 +78,13 @@ securityFilter.registerPublicRoute = (route) => {
 
 /**
  * Tries to pull a client from the provided token.
- * @param {String} clientToken Token to process
+ * @param {Request Object} req Request to process
  */
-async function getClientIdFromToken(clientToken) {
+async function getClientIdFromToken(req) {
     let client = '';
     for (let i=0; i < tokenAuthenticators.length; i++) {
         try {
-            client = await tokenAuthenticators[i](clientToken);
+            client = await tokenAuthenticators[i](req);
 
             if (client) {
                 break;
