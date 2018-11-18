@@ -44,7 +44,7 @@ router.get('/:userId', (req, res, next) => {
     User.findById(id)
     .exec()
     .then(doc => {
-        console.log(doc);
+        console.log("DOC",doc);
         if (doc) {
             res.status(200).json(doc);
         } else {

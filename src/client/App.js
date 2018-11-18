@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import './app.css';
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import NavBar from './components/navbar';
 import PublicProfile from './components/publicProfile';
+import Home from './components/home';
+import About from './components/about';
 import axios from 'axios';
 
 import cognitoConfig from './config/cognitoConfig';
@@ -11,34 +14,34 @@ const userPool = new CognitoUserPool(cognitoConfig);
 
 export default class App extends Component {
   state = {
-    profile: {},
-    currentUserToken: {}
+    currentUserToken: {},
+    profiles : {}
   }
 
-  // Use this for when a user is first logged in - Phase 2
   componentDidMount() {
     try {
       this.loadCognitoUserJwt();
     } catch (err) {
       console.log(err);
     }
-
-    // fetch('/api/getProfile:{currentUserId}')
-    //   .then(res => res.json())
-    //   .then(user => this.setState({ profile }));
   }
 
   render() {
-    return <div>
-        <NavBar onGetProfile={this.handleGetProfile}/>
-        <main className="container">
-          <PublicProfile profile={this.state.profile} />
-        </main>
-      </div>;
+    return <Router>
+        <div>
+        <NavBar onGetProfile={this.handleGetProfile} />
+          <Switch>
+            <Route path="/profile/:handle" component={PublicProfile} />
+            <Route path="/about" component={About} />
+            <Route path="/home" component={Home} />
+            <Route path="/" component={Home} />
+          </Switch>
+        </div>
+      </Router>;
   }
 
-
-  
+  // use this on the search page only.
+  // create links to the profiles
   handleGetProfile = searchParams => {
     console.log("Event handler called", searchParams);
     axios
@@ -49,12 +52,6 @@ export default class App extends Component {
         try {
           const profile = res.data[0]; // Just display the first result for now.
           console.log("profile", profile);
-
-          if (profile) {
-            this.setState({ profile });
-          } else {
-            this.setState({ profile: {} });
-          }
         } catch (e) {
           console.log(e);
         }
