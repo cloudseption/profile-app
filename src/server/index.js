@@ -26,6 +26,7 @@ mongoose.connect(
 
 securityFilter.registerTokenFilter(cognitoTokenFilter);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
+securityFilter.registerPublicRoute('*:/auth/*');
 
 // Middleware
 app.use(morgan('dev')); // Used for logging requests
