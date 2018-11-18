@@ -2,9 +2,18 @@ const mongoose      = require('mongoose');
 const PermissionSet = require('../api/models/permissionSet');
 
 const tokenAuthenticators   = [];
-const resourcePaths         = [];
+const resourceResolvers     = [];
 const publicRoutes          = [];
 
+/**
+ * Authenticates and authorizes/rejects incoming requests.
+ * 
+ * Retrieves the client ID from the token in the 'authorization' header.
+ * Retrieves the resource ID (based on registered resourceResolvers).
+ * 
+ * This pair is then checked against the permissions database + all registered
+ * public routes. Success passes the request along, and failure returns a 401.
+ */
 async function securityFilter(req, res, next) {
     req.permissions = [];
 
@@ -55,10 +64,10 @@ securityFilter.registerTokenFilter = (tokenAuthenticator) => {
  * should be searched.
  * 
  * Use:
- * securityFilter.registerResourcePath(['headers','userid']);
+ * securityFilter.registerResourceResolver(['headers','userid']);
  */
-securityFilter.registerResourcePath = (path) => {
-    resourcePaths.push(path);
+securityFilter.registerResourceResolver = (path) => {
+    resourceResolvers.push(path);
 };
 
 /**
@@ -99,25 +108,13 @@ async function getClientIdFromToken(clientToken) {
  */
 function getResourceId(req) {
     let resourceId = '';
-    for (let i=0; i < resourcePaths.length; i++) {
-        
-        let path    = resourcePaths[i];
-        let current = req;
-        for (let j=0; j < path.length; j++) {
-            if (current[path[j]]) {
-                current = current[path[j]];
-            } else {
-                current = null;
-                break;
-            }
-        }
-
+    for (let i=0; i < resourceResolvers.length; i++) {
+        let current = resourceResolvers[i](req);
         if (current) {
             resourceId = current;
             break;
         }
     }
-
     return resourceId;
 }
 
