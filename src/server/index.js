@@ -10,7 +10,8 @@ const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv").config();
 
 const securityFilter = require('./security/securityFilter');
-const cognitoTokenFilter = require('./security/cognitoTokenFilter');
+const cognitoTokenResolver = require('./security/cognitoTokenResolver');
+const appTokenResolver = require('./security/appTokenResolver');
 
 const authProviderSingleton = require('./auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
 authProviderSingleton.config = require('./auth/api/v1_0_0/config');
@@ -31,7 +32,8 @@ app.use(bodyParser());
 app.use(morgan('dev')); // Used for logging requests
 
 // Set up security Filter
-securityFilter.registerTokenResolver(cognitoTokenFilter);
+securityFilter.registerTokenResolver(cognitoTokenResolver);
+securityFilter.registerTokenResolver(appTokenResolver);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
 securityFilter.registerPublicRoute('*:/api/resources/*');
 securityFilter.registerPublicRoute('*:/api/apps/*');

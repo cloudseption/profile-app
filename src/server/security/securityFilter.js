@@ -38,9 +38,20 @@ async function securityFilter(req, res, next) {
     let method      = req.method.toUpperCase();
     let permissions = req.permissions;
 
+    console.log({
+        clientId: req.clientId,
+        resourceId: req.resourceId
+    });
+
     if (isRouteAuthorized(route, method, permissions)) {
         next();
     } else {
+        console.log('Blocking unauthorized request', {
+            route: route,
+            method: method,
+            clientId: req.clientId,
+            resourceId: req.resourceId
+        });
         res.status(401).json({
             error:      'unauthorized',
             clientId:   req.clientId    || 'undefined',
