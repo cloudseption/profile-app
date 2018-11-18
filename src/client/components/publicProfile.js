@@ -4,6 +4,7 @@ import ProfilePicture from "./profilePicture";
 import BadgeFrame from "./badgeFrame";
 import Badge from "./badge";
 import Biography from "./biography";
+import axios from "axios";
 
 class PublicProfile extends Component {
   // Hardcoded badgedata for now
@@ -27,23 +28,51 @@ class PublicProfile extends Component {
         iconUrl: `https://static.thenounproject.com/png/2576-200.png`,
         text: `iggie wigge whatever`
       }
-    ]
+    ],
+    profile: {}
   };
+
+  componentDidMount() {
+    const {handle} = this.props.match.params;
+
+    axios
+      .get(
+      `http://localhost:8080/users/${handle}`
+      )
+      .then(res => {
+        try {
+          console.log("RESPONSE", res.data);
+          const profile = res.data;
+          //console.log("profile", profile);
+
+          if (profile) {
+            this.setState({ profile });
+          } else {
+            this.setState({ profile: {} });
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      });
+    }
+  
 
   render() {
     console.log("PROPS", this.props.profile);
-    return (
-      <React.Fragment>
+    console.log("STATE", this.state);
+    return <React.Fragment>
         <div className="card m-2">
           <div className="card-header container banner_frame">
             <div className="row">
               <div className="col-12">
-                <Name value={this.props.profile.name} />
+                {/* <Name value={this.props.profile.name} /> */}
+                <Name value={this.state.profile.name} />
               </div>
             </div>
             <div className="row">
               <div className="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9">
-                <ProfilePicture picture={this.props.profile.picture} />
+                {/* <ProfilePicture picture={this.props.profile.picture} /> */}
+                <ProfilePicture picture={this.state.profile.picture} />
               </div>
               <div className="col-8 col-sm-7 col-md-5 col-lg-4 col-xl-3 description_frame">
                 <BadgeFrame badgeData={this.state.badgeData} />
@@ -51,11 +80,11 @@ class PublicProfile extends Component {
             </div>
           </div>
           <div className="card-body">
-            <Biography text={this.props.profile.description} />
+            {/* <Biography text={this.props.profile.description} /> */}
+          <Biography text={this.state.profile.description} />
           </div>
         </div>
-      </React.Fragment>
-    );
+      </React.Fragment>;
   }
 }
 

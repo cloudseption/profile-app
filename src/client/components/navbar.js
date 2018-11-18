@@ -26,10 +26,6 @@ class NavBar extends Component {
             </form>
           </nav>;
     }
-
-    getSearchText() {
-        
-    }
 }
 
 export default NavBar;

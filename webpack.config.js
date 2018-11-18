@@ -33,11 +33,38 @@ module.exports = {
   devServer: {
     port: 3000,
     open: true,
-    proxy: {
-      "/api": "http://localhost:8080",
-      "/auth": "http://localhost:8080",
-      "/users": "http://localhost:8080"
-    }
+    proxy: [
+      {
+        context: [
+          "/api",
+          "/auth",
+        ],
+        target: "http://localhost:8080"
+      },
+      {
+        context: [
+          "**",
+          "!/api",
+          "!/auth",
+        ],
+        target: "http://localhost:3000",
+        pathRewrite: {
+          '^/.*': function (path, req) {
+            // console.log("REWRITE");
+            let output;
+            if (/([^/])+\.([^/])+$/.test(path)) {
+              // console.log('OTHER FILE');
+              output = '/' + /([^/])*\/?$/.exec(path)[0];
+            } else {
+              // console.log('ENDPOINT - SEND TO INDEX.HTML');
+              output = '/index.html';
+            }
+            // console.log(output);
+            return output;
+          }
+        },
+      }
+    ]
   },
   plugins: [
     new CleanWebpackPlugin([outputDirectory]),
