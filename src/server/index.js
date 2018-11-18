@@ -2,10 +2,14 @@ const express = require('express');
 const app = express();
 const os = require('os');
 const auth = require('./auth/router');
+const apiRouter = require('./api/router');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const dotenv = require("dotenv").config();
+
+const securityFilter = require('./security/securityFilter');
+const cognitoTokenFilter = require('./security/cognitoTokenFilter');
 
 const authProviderSingleton = require('./auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
 authProviderSingleton.config = require('./auth/api/v1_0_0/config');
@@ -21,10 +25,17 @@ mongoose.connect(
 );
 
 // Middleware
-app.use(express.static('dist'));
 app.use(morgan('dev')); // Used for logging requests
-app.use(bodyParser.urlencoded({ extended: false })); // TODO: Remove, depreciated.
-app.use(bodyParser.json()); // TODO: Remove, depreciated.
+
+// Set up security Filter
+securityFilter.registerTokenResolver(cognitoTokenFilter);
+securityFilter.registerPublicRoute('*:/api/permissions/*');
+securityFilter.registerPublicRoute('*:/auth/*');
+securityFilter.registerPublicRoute('*:/user/*');
+securityFilter.registerPublicRoute('*:/users/*');
+app.use(securityFilter);
+
+app.use(express.static('dist'));
 
 // Add CORS headers to request
 app.use((req, res, next) => {
@@ -39,11 +50,8 @@ app.use((req, res, next) => {
 
 // Routes to handle requests
 app.use('/auth', auth);
+app.use('/api', apiRouter);
 app.use('/users', userRoutes);
-
-app.get('/api/getUsername', (req, res) => { // Remove this once users api is connected to frontend
-  res.send({ username: os.userInfo().username });
-});
 
 // Middleware to catch all errors
 app.use((req, res, next) => {
