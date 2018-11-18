@@ -34,6 +34,7 @@ app.use(morgan('dev')); // Used for logging requests
 securityFilter.registerTokenResolver(cognitoTokenFilter);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
 securityFilter.registerPublicRoute('*:/api/resources/*');
+securityFilter.registerPublicRoute('*:/api/apps/*');
 securityFilter.registerPublicRoute('*:/auth/*');
 securityFilter.registerPublicRoute('*:/user/*');
 securityFilter.registerPublicRoute('*:/users/*');
