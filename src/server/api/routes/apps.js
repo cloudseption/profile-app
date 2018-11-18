@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const jose = require('node-jose');
 
 const App = require('../models/app');
 
@@ -64,15 +65,17 @@ router.post('/', (req, res, next) => {
             throw new Error(`Application ID ${appName} already exists.`);
         }
     })
-    .then(() => {
+    .then(generateKeyPair)
+    .then(key => {
+        console.log(key);
         return new App({
             _id: new mongoose.Types.ObjectId(),
             appId:                  req.body.appId,
             displayName:            req.body.displayName,
             url:                    req.body.url,
             appToken:               req.body.appToken,
-            clientKey:              null,
-            clientSecret:           null,
+            clientKey:              key.kid,
+            clientSecret:           key.k,
             requiredResources:      req.body.requiredResources
         });
     })
@@ -80,10 +83,13 @@ router.post('/', (req, res, next) => {
         return newApp.save()
         .then(() => {
             res.status(201).json({
-                message: "Handling POST requests to /apps",
-                createdApp: newApp
+                message: `Set up new app ${newApp.appId}. Please keep your `
+                + `clientKey, clientSecret, and appToken safe`,
+                clientKey: newApp.clientKey,
+                clientSecret: newApp.clientSecret,
+                appToken: newApp.appToken
             });
-        })
+        });
     })
     .catch(err => {
         let msg = err;
@@ -95,6 +101,35 @@ router.post('/', (req, res, next) => {
             error: msg
         });
     });
+});
+
+router.post('/:appName/keypair', (req, res, next) => {
+    let kid;
+    let secret;
+
+    App.findOne({ appId: req.params.appName })
+    .exec()
+    .then(docs => docs._id )
+    .then(id => {
+        return generateKeyPair()
+        .then(key => {
+            kid     = key.kid;
+            secret  = key.k;
+            return App.update({ _id: id }, {
+                $set: {
+                    clientKey: key.kid,
+                    clientSecret: key.k
+                }
+            }).exec();
+        });
+    })
+    .then(() => {
+        res.json({
+            message: `New client key/client secret generated for ${req.params.appName}.`,
+            clientKey: kid,
+            clientSecret: secret
+        });
+    })
 });
 
 router.patch('/:appName', (req, res, next) => {
@@ -131,5 +166,10 @@ router.delete("/:appId", (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
+
+function generateKeyPair() {
+    return jose.JWK.createKey("oct", 256, { alg: 'HS256' })
+    .then(key => key.toJSON(true));
+}
 
 module.exports = router;
