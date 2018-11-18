@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const extAppSchema = mongoose.Schema({
+const appSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     appId: String,
     displayName: String,
@@ -11,4 +11,4 @@ const extAppSchema = mongoose.Schema({
     requiredResources: [String]
 });
 
-module.exports = mongoose.model('ExtApp', extAppSchema);
+module.exports = mongoose.model('App', appSchema);

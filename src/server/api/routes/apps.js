@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-const ExtApp = require('../models/extApp');
+const App = require('../models/app');
 
 router.get('/', (req, res, next) => {
-    ExtApp.find()
+    App.find()
     .exec()
     .then(docs => {
         let sanitizedDocs = [];
@@ -27,13 +27,13 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.get('/:extAppId', (req, res, next) => {
-    console.log(req.params.extAppId);
-    ExtApp.findOne({ appId: req.params.extAppId })
+router.get('/:appId', (req, res, next) => {
+    console.log(req.params.appId);
+    App.findOne({ appId: req.params.appId })
     .exec()
     .then(doc => {
         if (!doc) {
-            throw new Error(`${req.params.extAppId} not found`);
+            throw new Error(`${req.params.appId} not found`);
         }
         let sanitizedDoc = {
             _id:               doc._id,
@@ -55,17 +55,17 @@ router.get('/:extAppId', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    let extAppName  = req.body.name;
+    let appName  = req.body.name;
 
-    ExtApp.find({ name: extAppName })
+    App.find({ name: appName })
     .exec()
     .then(docs => {
         if (docs.length > 0) {
-            throw new Error(`Application ID ${extAppName} already exists.`);
+            throw new Error(`Application ID ${appName} already exists.`);
         }
     })
     .then(() => {
-        return new ExtApp({
+        return new App({
             _id: new mongoose.Types.ObjectId(),
             appId:                  req.body.appId,
             displayName:            req.body.displayName,
@@ -76,12 +76,12 @@ router.post('/', (req, res, next) => {
             requiredResources:      req.body.requiredResources
         });
     })
-    .then(newExtApp => {
-        return newExtApp.save()
+    .then(newApp => {
+        return newApp.save()
         .then(() => {
             res.status(201).json({
-                message: "Handling POST requests to /extApps",
-                createdExtApp: newExtApp
+                message: "Handling POST requests to /apps",
+                createdApp: newApp
             });
         })
     })
@@ -97,17 +97,17 @@ router.post('/', (req, res, next) => {
     });
 });
 
-router.patch('/:extAppName', (req, res, next) => {
+router.patch('/:appName', (req, res, next) => {
     const updateOperations = {};
     for (const ops of req.body) {
         updateOperations[ops.propName] = ops.value;
     }
 
-    ExtApp.findOne({ appId: req.params.extAppName })
+    App.findOne({ appId: req.params.appName })
     .exec()
     .then(docs => docs._id )
     .then(id => {
-        return ExtApp.update({ _id: id }, { $set: updateOperations }).exec();
+        return App.update({ _id: id }, { $set: updateOperations }).exec();
     })
     .then(result => {
         // console.log(result);
@@ -119,9 +119,9 @@ router.patch('/:extAppName', (req, res, next) => {
     });
 });
 
-router.delete("/:extAppId", (req, res, next) => {
-    const id = req.params.extAppId;
-    ExtApp.remove({appId: id})
+router.delete("/:appId", (req, res, next) => {
+    const id = req.params.appId;
+    App.remove({appId: id})
     .exec()
     .then(result => {
         res.status(200).json(result);

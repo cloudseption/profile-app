@@ -1,8 +1,8 @@
-const ExtApp   = require('../api/models/extApp');
+const App   = require('../api/models/app');
 
 function appTokenResolver(req) {
     let token = req.headers.authorization;
-    return ExtApp.findOne({ appToken: token })
+    return App.findOne({ appToken: token })
     .exec()
     .then(doc => {
         if (doc) {
