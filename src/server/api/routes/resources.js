@@ -31,31 +31,40 @@ router.get('/:resourceId', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    Resource.find({ name: req.params.resourceId })
+    let resourceName = req.body.name;
+    let displayName  = req.body.displayName;
+
+    Resource.find({ name: resourceName })
     .exec()
     .then(docs => {
         if (docs.length > 0) {
-            throw new Error(`Resource ${req.params.resourceId} already exists.`);
+            throw new Error(`Resource ${resourceName} already exists.`);
         }
     })
     .then(() => {
-        const resource = new Resource({
+        return new Resource({
             _id: new mongoose.Types.ObjectId(),
-            name: req.body.name, 
-            displayName: req.body.displayName,
+            name: resourceName, 
+            displayName: displayName,
         });
-        resource.save().then(result => {
-            console.log(result);
+    })
+    .then(newResource => {
+        return newResource.save()
+        .then(() => {
             res.status(201).json({
                 message: "Handling POST requests to /resources",
-                createdUser: resource
+                createdResource: newResource
             });
         })
     })
     .catch(err => {
+        let msg = err;
+        if (err.message) {
+            msg = err.message;
+        }
         console.log(err);
         res.status(500).json({
-            error: err
+            error: msg
         });
     });
 });
@@ -78,35 +87,39 @@ router.get('/:resourceName', (req, res, next) => {
     });
 });
 
-// router.patch('/:userId', (req, res, next) => {
-//     const id = req.params.userId;
-//     const updateOperations = {};
-//     for (const ops of req.body) {
-//         updateOperations[ops.propName] = ops.value;
-//     }
-//     User.update({ _id: id }, { $set: updateOperations })
-//       .exec()
-//       .then(result => {
-//           console.log(result);
-//         res.status(200).json(result);
-//       })
-//       .catch(err => {
-//         console.log(err);
-//         res.status(500).json({ error: err });
-//       });
-// });
+router.patch('/', (req, res, next) => {
+    const updateOperations = {};
+    for (const ops of req.body) {
+        updateOperations[ops.propName] = ops.value;
+    }
 
-// router.delete("/:userId", (req, res, next) => {
-//     const id = req.params.userId;
-//     User.remove({_id: id})
-//     .exec()
-//     .then(result => {
-//         res.status(200).json(result);
-//     })
-//     .catch(err => {
-//         console.log(err);
-//         res.status(500).json({ error: err });
-//     });
-// });
+    Resource.findOne({ name: updateOperations.name })
+    .exec()
+    .then(docs => docs._id )
+    .then(id => {  
+        return Resource.update({ _id: id }, { $set: updateOperations }).exec();
+    })
+    .then(result => {
+        // console.log(result);
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+    });
+});
+
+router.delete("/:resourceId", (req, res, next) => {
+    const id = req.params.resourceId;
+    Resource.remove({_id: id})
+    .exec()
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+    });
+});
 
 module.exports = router;

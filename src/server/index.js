@@ -27,11 +27,13 @@ mongoose.connect(
 
 // Middleware
 app.use(cookieParser());
+app.use(bodyParser());
 app.use(morgan('dev')); // Used for logging requests
 
 // Set up security Filter
 securityFilter.registerTokenResolver(cognitoTokenFilter);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
+securityFilter.registerPublicRoute('*:/api/resources/*');
 securityFilter.registerPublicRoute('*:/auth/*');
 securityFilter.registerPublicRoute('*:/user/*');
 securityFilter.registerPublicRoute('*:/users/*');
