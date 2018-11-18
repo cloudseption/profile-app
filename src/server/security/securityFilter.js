@@ -54,7 +54,7 @@ async function securityFilter(req, res, next) {
 /**
  * Registers a token authenticator
  */
-securityFilter.registerTokenFilter = (tokenAuthenticator) => {
+securityFilter.registerTokenResolver = (tokenAuthenticator) => {
     tokenAuthenticators.push(tokenAuthenticator);
 };
 
@@ -156,7 +156,7 @@ function isRouteAuthorized(route, method, permissions) {
     let incomingRoute   = `${method}:${route}`.toLowerCase();
     let matchingRule    = allowedRoutes.find(routeRule => routeRule.test(incomingRoute));
     let matches         = Boolean(matchingRule);
-    
+
     // console.log('MATCHING', incomingRoute);
     // console.log('ALLOWED ROUTES', allowedRoutes);
     // console.log(matches);
