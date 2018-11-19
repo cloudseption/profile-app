@@ -12,7 +12,6 @@ router.get('/', (req, res, next) => {
         let sanitizedDocs = [];
         docs.forEach(doc => {
             sanitizedDocs.push({
-                _id:               doc._id,
                 appId:             doc.appId,
                 displayName:       doc.displayName,
                 url:               doc.url,
@@ -37,7 +36,6 @@ router.get('/:appId', (req, res, next) => {
             throw new Error(`${req.params.appId} not found`);
         }
         let sanitizedDoc = {
-            _id:               doc._id,
             appId:             doc.appId,
             displayName:       doc.displayName,
             url:               doc.url,
