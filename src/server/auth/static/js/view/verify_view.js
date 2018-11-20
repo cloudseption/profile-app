@@ -31,7 +31,7 @@ View.prototype = {
     verify: function() {
         let email = document.getElementById("emailInputVerify").value;
         let code = document.getElementById("codeInputVerify").value;
-
+        console.log('VerifyView# verify');
         this.verify_event.notify({
             email: email,
             code: code

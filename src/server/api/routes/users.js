@@ -8,7 +8,7 @@ router.get('/', (req, res, next) => {
     User.find()
     .exec()
     .then(docs => {
-        console.log(docs);
+        // console.log(docs);
         res.status(200).json(docs);
     })
     .catch(err => {
@@ -143,7 +143,7 @@ router.post('/:userId', (req, res, next) => {
         }
     })
     .then(result => {
-        console.log(result);
+        // console.log(result);
         res.status(201).json({
             message: "Handling POST requests to /users",
             createdUser: user
@@ -165,7 +165,7 @@ router.get('/:userId', (req, res, next) => {
     User.findOne({ userId: id })
     .exec()
     .then(doc => {
-        console.log("DOC",doc);
+        // console.log(doc);
         if (doc) {
             res.status(200).json(doc);
         } else {
@@ -191,7 +191,7 @@ router.patch('/:userId', (req, res, next) => {
     User.update({ userId: id }, { $set: updateOperations })
       .exec()
       .then(result => {
-          console.log(result);
+        // console.log(result);
         res.status(200).json(result);
       })
       .catch(err => {
