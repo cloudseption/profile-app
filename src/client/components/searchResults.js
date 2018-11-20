@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './searchResults.css';
 
 class SearchResults extends Component {
 
@@ -8,13 +9,15 @@ class SearchResults extends Component {
     }
 
     render() {
-        return <div>
+        return <ul>
             {this.props.profiles.map(profile => <li key={profile.email}>
-                <button onClick={() => { this.goToProfile(profile)} }>
+                <div className="card m-2">
+                <button className="result-button" onClick={() => { this.goToProfile(profile)} }>
                     {profile.name}
                 </button>
+                </div>
               </li>)}
-          </div>;
+          </ul>;
     }
 }
  
