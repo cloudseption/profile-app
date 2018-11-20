@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const Axios = require('axios');
 
 const User = require('../models/user');
+const App = require('../models/app');
+const PermissionSet = require('../models/permissionSet');
 
 router.get('/', (req, res, next) => {
     User.find()
@@ -177,6 +180,73 @@ router.get('/:userId', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
+
+/**
+ * Queries all attached apps and returns their badgeData for the given user.
+ */
+router.get('/:userId/badge-data', (req, res, next) => {
+    let userId = req.params.userId;
+
+    App.find()
+    .exec()
+    .then(appsData => {
+        let requestPromises = [];
+
+        appsData.forEach(appData => {
+            let appId           = appData.appId;
+            let badgeEndpoint   = appData.badgeEndpoint;
+            let appToken        = appData.appToken;
+
+            if (badgeEndpoint && didUserAuthorizeApp(userId, appId)) {
+                let requestPromise = postToRemoteBadgeEndpoint(
+                    appId, badgeEndpoint, appToken, userId);
+
+                requestPromises.push(requestPromise);
+            }
+        });
+
+        return Promise.all(requestPromises);
+    })
+    .then(responses => {
+        let results = [];
+        responses.forEach(response => {
+            results = results.concat(response);
+        });
+        res.status(200).json(results);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+});
+
+function postToRemoteBadgeEndpoint(appId, badgeEndpoint, appToken, userId) {
+    let headers = {
+        'Authorization' : appToken,
+        'UserId' : userId
+    }
+
+    let requestPromise = Axios.post(badgeEndpoint, {},
+        { headers: headers })
+    .then(res => res.data.badgeData)
+    .catch(err => { console.log(`Error hitting badge endpoint for ${appId}: ${err.message} - Skipping`); });
+
+    return requestPromise;
+}
+
+function didUserAuthorizeApp(userId, appId) {
+    console.log("didUserAuthorizeApp");
+    PermissionSet.findOne({ clientId: appId, resourceId: userId })
+    .exec()
+    .then(permissionSet => {
+        console.log("didUserAuthorizeApp - request returned")
+        return permissionSet && permissionSet.permissions.includes('DISPLAY:badge');
+    })
+    .then(result => {
+        console.log(result);
+        return result;
+    })
+    return true;
+}
 
 router.patch('/:userId', (req, res, next) => {
     const id = req.params.userId;
