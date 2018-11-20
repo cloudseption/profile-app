@@ -28,7 +28,7 @@ Controller.prototype = {
 
     // Verify user with cognito
     verify: function(email, code, onSuccess, onFailure) {
-        this.create_cognito_user(email).confirmRegistration(code, true, function confirmCallback(err, result) {
+        this.create_cognito_user(email).confirmRegistration(code, true, (err, result) => {
             if (!err) {
                 onSuccess(result);
             } else {
@@ -59,9 +59,30 @@ Controller.prototype = {
     
                         document.cookie = cname + "=" + value;
                     })('cognitoToken', idToken, 365);
-                    m.verify();
+
+                    console.log(`let result = ${JSON.stringify(result)}`);
+
+                    console.log('Verifying user...');
+                    fetch(`/api/users/verify`, {
+                        method: 'post',
+                        headers: {
+                            "Content-Type": "application/json; charset=utf-8",
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            userId: result.idToken.payload.sub
+                        })
+                    })
+                    .then((res) => {
+                        console.log(res);
+                        m.verify();
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
                 },
                 function verifyError(err) {
+                    console.log(err);
                     m.verify_error();
                 }
             );

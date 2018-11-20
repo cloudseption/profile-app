@@ -25,7 +25,7 @@ router.post('/', (req, res, next) => {
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
         userId: req.body.userId || '',
-        userId: req.body.email || '',
+        email: req.body.email || '',
         name: req.body.name,
         description: req.body.description,
         picture: req.body.picture
@@ -50,6 +50,78 @@ router.post('/', (req, res, next) => {
         });
     });
 });
+
+/**
+ * Should be posted when a user has entered their e-mail and name, but before
+ * we send them off to cognito. Sets them up in the database so that we can
+ * finish registering them later.
+ */
+router.post('/pre-register', (req, res, next) => {
+    console.log('PRE-REGISTER', req.body);
+    
+    const email = req.body.email;
+    const name  = req.body.name;
+
+    let user;
+
+    User.findOne({ email: email })
+    .exec()
+    .then(doc => {
+        if (!doc) {
+            user = new User({
+                _id: new mongoose.Types.ObjectId(),
+                email:  email,
+                name:   name,
+            });
+            return user.save();
+        }
+        else if (!doc.userId) {
+            return doc;
+        }
+        else {
+            throw new Error(`User with email ${email} already exists`);
+        }
+    })
+    .then(result => {
+        res.status(201).json({
+            message: "Handling POST requests to /users/pre-register",
+            createdUser: user
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        if (err.message) {
+            err = err.message;
+        }
+        res.status(400).json({
+            error: err
+        });
+    });
+})
+
+/**
+ * Should be called when the user has verified their e-mail address with
+ * Cognito. This will finalize them in the user DB.
+ */
+router.post('/verify', (req, res, next) => {
+    const email             = req.body.email;
+    const userId            = req.body.userId;
+    const updateOperations  = {
+        userId:         userId,
+        description:    '',
+        picture:        ''
+    };
+
+    User.update({ email: email }, { $set: updateOperations })
+    .exec()
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+    });
+})
 
 router.post('/:userId', (req, res, next) => {
     const user = new User({
@@ -131,6 +203,19 @@ router.patch('/:userId', (req, res, next) => {
 router.delete("/:userId", (req, res, next) => {
     const id = req.params.userId;
     User.remove({ userId: id })
+    .exec()
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+    });
+});
+
+router.delete("/:userId/by-obj-id", (req, res, next) => {
+    const id = req.params.userId;
+    User.remove({ _id: id })
     .exec()
     .then(result => {
         res.status(200).json(result);
