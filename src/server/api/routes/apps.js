@@ -15,6 +15,8 @@ router.get('/', (req, res, next) => {
                 appId:             doc.appId,
                 displayName:       doc.displayName,
                 url:               doc.url,
+                badgeEndpoint:     doc.badgeEndpoint,
+                landingEndpoint:   doc.landingEndpoint,
                 appToken:          doc.appToken,
                 requiredResources: doc.requiredResources,
             });
@@ -39,6 +41,8 @@ router.get('/:appId', (req, res, next) => {
             appId:             doc.appId,
             displayName:       doc.displayName,
             url:               doc.url,
+            badgeEndpoint:     doc.badgeEndpoint,
+            landingEndpoint:   doc.landingEndpoint,
             appToken:          doc.appToken,
             requiredResources: doc.requiredResources,
         }
@@ -71,6 +75,8 @@ router.post('/', (req, res, next) => {
             appId:                  req.body.appId,
             displayName:            req.body.displayName,
             url:                    req.body.url,
+            badgeEndpoint:          req.body.badgeEndpoint,
+            landingEndpoint:        req.body.landingEndpoint,
             appToken:               req.body.appToken,
             clientKey:              key.kid,
             clientSecret:           key.k,
