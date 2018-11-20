@@ -5,14 +5,16 @@ import axios from "axios";
 
 class SearchContainer extends Component {
     state = { profiles: [] }
+
     render() { 
-        return <React.Fragment>
-            <SearchBar onGetProfile={this.handleGetProfile} />
-            <SearchResults profiles={this.state.profiles} />
-          </React.Fragment>;
+        return (
+            <React.Fragment>
+                <SearchBar onGetProfile={this.handleGetProfile} />
+                <SearchResults profiles={this.state.profiles} />
+            </React.Fragment>
+        );
     }
 
-    // TODO: create links to the profiles
     handleGetProfile = searchParams => {
         console.log("Event handler called", searchParams);
         axios

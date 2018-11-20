@@ -28,7 +28,7 @@ export default class App extends Component {
   render() {
     return <Router>
         <div>
-        <NavBar  />
+        <NavBar />
           <Switch>
             <Route path="/profile/:handle" component={PublicProfile} />
             <Route path="/about" component={About} />

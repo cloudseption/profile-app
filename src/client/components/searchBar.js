@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 
 class SearchBar extends Component {
-  state = { value: "" };
+  state = {
+    value: ""
+  };
 
   handleChange = this.handleChange.bind(this);
   handleSubmit = this.handleSubmit.bind(this);
