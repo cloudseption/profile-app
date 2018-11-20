@@ -32,10 +32,12 @@ View.prototype = {
     // Accepts input from user and registers user
     register: function() {
         let email = document.getElementById("emailInputRegister").value;
+        let name = document.getElementById("nameInputRegister").value;
         let password = document.getElementById("passwordInputRegister").value;
         let password2 = document.getElementById("password2InputRegister").value;
         this.register_event.notify({
             email: email,
+            name: name,
             password: password,
             password2: password2
         });

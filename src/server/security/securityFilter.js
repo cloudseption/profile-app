@@ -38,10 +38,10 @@ async function securityFilter(req, res, next) {
     let method      = req.method.toUpperCase();
     let permissions = req.permissions;
 
-    console.log({
-        clientId: req.clientId,
-        resourceId: req.resourceId
-    });
+    // console.log({
+    //     clientId: req.clientId,
+    //     resourceId: req.resourceId
+    // });
 
     if (isRouteAuthorized(route, method, permissions)) {
         next();

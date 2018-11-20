@@ -28,11 +28,30 @@ Controller.prototype = {
 
     // Verify user with cognito
     verify: function(email, code, onSuccess, onFailure) {
-        this.create_cognito_user(email).confirmRegistration(code, true, function confirmCallback(err, result) {
+        let user = this.create_cognito_user(email);
+
+        // aws-cognito-sdk-js seems to have some weird bug with fetch, where
+        // both onSuccess and onFailure get called, even though the result is
+        // just fine. This is my hack to get around it. Also, the gross hack
+        // where I extract the user's jwtToken and userId down below. Sorry.
+        let didSucceed = false;
+        user.confirmRegistration(code, true, (err, result) => {
             if (!err) {
-                onSuccess(result);
+                didSucceed      = true;
+                let userId      = user.storage.userId;
+                let jwtToken    = user.storage[Object.keys(user.storage).find(key => key.includes('idToken'))];
+                let usefulResults = {
+                    idToken: {
+                        jwtToken: jwtToken,
+                        payload: { sub: userId }
+                    }
+                };
+                
+                onSuccess(usefulResults);
             } else {
-                onFailure(err);
+                if (!didSucceed) {
+                    onFailure(err);
+                }
             }
         });
     },
@@ -46,22 +65,34 @@ Controller.prototype = {
             this.verify(args.email, args.code,
                 function verifySuccess(result) {
                     let idToken = result.idToken.jwtToken;
-                    console.log(idToken);
     
-                    ((cname, cvalue, exdays) => {
-                        console.log('saving')
-                        let d = new Date();
-                        d.setTime(d.getTime() + (exdays*24*60*60*1000));
-                        let expires = "expires="+ d.toUTCString();
-                        let value = cvalue + ";" + expires + ";path=/"
-    
-                        console.log(cname, value);
-    
-                        document.cookie = cname + "=" + value;
-                    })('cognitoToken', idToken, 365);
-                    m.verify();
+                    // // I don't think I need this...
+                    // (function saveCookie(cname, cvalue, exdays) {
+                    //     let d = new Date();
+                    //     d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                    //     let expires = "expires="+ d.toUTCString();
+                    //     let value = cvalue + ";" + expires + ";path=/"
+                    //     document.cookie = cname + "=" + value;
+                    // })('cognitoToken', idToken, 365);
+
+                    let body = {
+                        email: args.email,
+                        userId: result.idToken.payload.sub
+                    };
+
+                    const url = `${document.location.protocol}//${document.location.host}/api/users/verify`;
+                    fetch(url, {
+                        method: 'post',
+                        headers: {
+                            "Content-Type": "application/json; charset=utf-8",
+                        },
+                        body: JSON.stringify(body)
+                    })
+                    .then((res) => { m.verify(); })
+                    .catch(err => { console.log(err); });
                 },
                 function verifyError(err) {
+                    console.log('in verifyError', err);
                     m.verify_error();
                 }
             );
