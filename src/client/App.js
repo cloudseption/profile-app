@@ -5,10 +5,10 @@ import NavBar from './components/navbar';
 import PublicProfile from './components/publicProfile';
 import Home from './components/home';
 import About from './components/about';
-import axios from 'axios';
 
 import cognitoConfig from './config/cognitoConfig';
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
+import SearchContainer from './components/searchContainer';
 
 const userPool = new CognitoUserPool(cognitoConfig);
 
@@ -29,33 +29,16 @@ export default class App extends Component {
   render() {
     return <Router>
         <div>
-        <NavBar onGetProfile={this.handleGetProfile} />
+        <NavBar  />
           <Switch>
             <Route path="/profile/:handle" component={PublicProfile} />
             <Route path="/about" component={About} />
             <Route path="/home" component={Home} />
+            <Route path="/search" component={SearchContainer} />
             <Route path="/" component={Home} />
           </Switch>
         </div>
       </Router>;
-  }
-
-  // use this on the search page only.
-  // create links to the profiles
-  handleGetProfile = searchParams => {
-    console.log("Event handler called", searchParams);
-    axios
-      .get(
-        `https://guarded-retreat-70427.herokuapp.com/api/search?input=${searchParams}`
-      )
-      .then(res => {
-        try {
-          const profile = res.data[0]; // Just display the first result for now.
-          console.log("profile", profile);
-        } catch (e) {
-          console.log(e);
-        }
-      });
   }
 
   /*
