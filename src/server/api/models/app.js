@@ -5,6 +5,8 @@ const appSchema = mongoose.Schema({
     appId: String,
     displayName: String,
     url: String,                    // App homepage
+    badgeEndpoint: String,          // Go here to get badge data
+    landingEndpoint: String,        // Go here to get landing data
     appToken: String,
     clientKey: String,
     clientSecret: String,           // should probably encrypt this
