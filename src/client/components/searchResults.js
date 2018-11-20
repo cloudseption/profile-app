@@ -4,7 +4,7 @@ import './searchResults.css';
 class SearchResults extends Component {
 
     goToProfile = (profile) => {
-        let userId = profile._id;
+        let userId = profile.userId;
         window.location.href =`/profile/${userId}`
     }
 
