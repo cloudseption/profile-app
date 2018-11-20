@@ -14,8 +14,7 @@ const userPool = new CognitoUserPool(cognitoConfig);
 
 export default class App extends Component {
   state = {
-    currentUserToken: {},
-    profiles : {}
+    currentUserToken: {}
   }
 
   componentDidMount() {

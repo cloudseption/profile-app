@@ -4,11 +4,11 @@ import SearchResults from './searchResults';
 import axios from "axios";
 
 class SearchContainer extends Component {
-    state = {  }
+    state = { profiles: [] }
     render() { 
         return <React.Fragment>
             <SearchBar onGetProfile={this.handleGetProfile} />
-            <SearchResults />
+            <SearchResults profiles={this.state.profiles} />
           </React.Fragment>;
     }
 
@@ -21,8 +21,9 @@ class SearchContainer extends Component {
             )
             .then(res => {
                 try {
-                    const profile = res.data;
-                    console.log("profile", profile);
+                    const profiles = res.data;
+                    console.log("profiles", profiles);
+                    this.setState({ profiles });
                 } catch (e) {
                     console.log(e);
                 }
