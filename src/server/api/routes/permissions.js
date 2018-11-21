@@ -20,7 +20,7 @@ router.get('/', (req, res, next) => {
 router.post('/:clientId/:resourceId', (req, res, next) => {
     let clientId    = req.params.clientId;
     let resourceId  = req.params.resourceId;
-    let permissions = req.query.permission;
+    let permissions = req.body.permissions;
 
     if (!Array.isArray(permissions)) {
         permissions = [ permissions ];

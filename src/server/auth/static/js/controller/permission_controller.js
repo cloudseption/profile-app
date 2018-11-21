@@ -36,18 +36,19 @@ Controller.prototype = {
     get_cognito_user: function() {
         let cognitoUser = this.userPool.getCurrentUser();
         let self = this;
-        return new Promise(function fetchCurrentAuthToken(resolve, reject) {
+        return new Promise((resolve, reject) => {
             if (!cognitoUser) {
                 // Redirect to login
             }
 
-            cognitoUser.getSession(function sessionCallback(err, session) {
+            cognitoUser.getSession((err, session) => {
                 if (err) {
                     reject(err);
                 } else if (!session.isValid()) {
                     // Redirect to login
                 } else {
                     authToken = session.getIdToken().getJwtToken();
+                    this.userId = session.getIdToken().payload.sub;
                     self.authToken = authToken;
                     resolve(authToken);
                 }
@@ -58,13 +59,11 @@ Controller.prototype = {
     // Requests app metdata from the server
     request_app_metadata: function () {
         let appId = (new URLSearchParams(document.location.search)).get('appId');
-
         let url = `${window.location.origin}/api/apps/${appId}`;
 
         return fetch(url)
             .then(response => response.json())
             .then(responseJson => {
-                console.log(responseJson);
                 if (responseJson.error) {
                     throw new Error(responseJson.error);
                 }
@@ -83,11 +82,11 @@ Controller.prototype = {
 
     // Forwards the user's permission grant to the server
     handle_grant: function() {
-        console.log("Handle_grant");
         let appId       = this.model.data.appId;
         let authToken   = this.authToken;
+        let userId      = this.userId;
 
-        this.send_grant(appId, authToken)
+        this.send_grant(appId, authToken,userId )
         .then(this.redirect.bind(this))
         .catch(this.handle_error.bind(this));
     },
@@ -97,15 +96,18 @@ Controller.prototype = {
         this.redirect({ permission: 'DENIED' });
     },
 
-    send_grant: function(appId, authToken) {
-        let url = `${window.location.origin}/auth/api/1.0.0/permission/${appId}`;
+    send_grant: function(appId, authToken, userId) {
+        let permissions = this.model.data.requiredResources;
+        let url = `${window.location.origin}/api/permissions/${appId}/${userId}`;
         return fetch(url,
             {
                 method: "POST",
                 mode: "same-origin",
                 headers: {
-                    'Authorization': authToken
-                }
+                    'Authorization': authToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ permissions: permissions })
             })
             .then(response => response.json())
             .then(responseJson => {
