@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 const styles = theme => ({
     root: {
       width: '100%',
-      maxWidth: 700,
+      maxWidth: 900,
       backgroundColor: theme.palette.background.paper,
       margin: 'auto',
       padding: '20px'
@@ -30,6 +30,7 @@ class AppCard extends Component {
 
         return (      
             <div className={classes.root}>
+                <List>
                 <Card>
                     <CardContent>
                         <List>
@@ -37,13 +38,14 @@ class AppCard extends Component {
                             <Avatar src={this.props.imgUrl}/>
                             <ListItemText primary={this.props.appName}/>
                             {this.displayApplicationData()}
-                            <Button variant="contained" color="primary" > 
+                            <Button onClick={this.openApp} variant="contained" color="primary" > 
                                 To App 
                             </Button>
                             </ListItem>
                         </List>
                     </CardContent>
                 </Card>
+                </List>
             </div>
         );
     }
@@ -65,6 +67,10 @@ class AppCard extends Component {
         </ListItem>
         </List>
        )
+    }
+
+    openApp = () => {
+       window.location = this.props.appUrl;
     }
 }
  
