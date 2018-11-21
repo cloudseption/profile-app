@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import List from '@material-ui/core/List';
 import AppCard from './appCard.js';
-import Button from '@material-ui/core/Button';
 
 class Home extends Component {
     
@@ -9,14 +8,16 @@ class Home extends Component {
         landingPageData : [
             {
                 appName: "app1",
-                imgurl: "https://png.icons8.com/app",
-                data: ["app data"]
+                imgUrl: "https://png.icons8.com/app",
+                appUrl: "",
+                data: ["app data", "app data2", "app data3", "appData4"]
             },
 
             {
-                appName: "app1",
-                imgurl: "https://png.icons8.com/app",
-                data: ["app data"]
+                appName: "app2",
+                imgUrl: "https://png.icons8.com/app",
+                appUrl: "",
+                data: ["app data", "app data2", "app data3", "appData4"]
             }
         ]
     }
@@ -24,10 +25,11 @@ class Home extends Component {
     render() { 
         return (      
             <div>
-            <Button variant="contained" color="primary">Profile</Button>
             <List>
             {this.state.landingPageData.map(appData => (
-                <AppCard appName={appData.appName} imgurl={appData.imgurl} data={appData.data}/>                
+                <AppCard key={appData.appName}
+                    appName={appData.appName} imgUrl={appData.imgUrl} 
+                    appUrl={appData.appUrl} data={appData.data}/>                
             ))}
             </List>
             </div>

@@ -6,8 +6,8 @@ import ListItem from '@material-ui/core/ListItem';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import {Link} from 'react-router-dom';
 
 const styles = theme => ({
     root: {
@@ -21,17 +21,10 @@ const styles = theme => ({
     badge: {
        margin: '20px'
     },
-    
 });
 
 class AppCard extends Component {
     
-    state = {  
-        appName: this.props.appName,
-        imgUrl: this.props.imgUrl,
-        data: this.props.data
-    }
-
     render() { 
         const { classes } = this.props;
 
@@ -41,34 +34,41 @@ class AppCard extends Component {
                     <CardContent>
                         <List>
                             <ListItem>
-                            <Avatar src={this.getImgUrl()}/>
-                            <ListItemText primary={this.getAppName()}/>
+                            <Avatar src={this.props.imgUrl}/>
+                            <ListItemText primary={this.props.appName}/>
+                            {this.displayApplicationData()}
                             <Button variant="contained" color="primary" > 
                                 To App 
                             </Button>
-
                             </ListItem>
                         </List>
-                        <Typography>
-                           {this.getData()}
-                        </Typography>
                     </CardContent>
                 </Card>
             </div>
         );
     }
 
-    getAppName = () => {
-        return this.state.appName;
+    displayApplicationData = () => {
+       let appDataNumber = 3;
+       let data = this.props.data;
+       let newData;
+       if (data.length > appDataNumber) {
+           newData = data.slice(data.length - appDataNumber);
+       }
+
+       return (
+        <List>
+        <ListItem>
+            <ListItemText primary={newData[0]}/>
+            <ListItemText primary={newData[1]}/>
+            <ListItemText primary={newData[2]}/>
+        </ListItem>
+        </List>
+       )
     }
 
-    getImgUrl = () => {
-        return this.state.imgurl;
-    }
-
-    getData = () => {
-        return this.state.data;
-    }
+   
+    
 }
  
 export default withStyles(styles)(AppCard);
