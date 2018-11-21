@@ -61,6 +61,7 @@ $(function () {
         }
     })
     .then(function returnUserViaRedirect(jsonResponse) {
+        let permission = jsonResponse.permission;
         if (jsonResponse.error) {
             console.log(jsonResponse.error);
         }

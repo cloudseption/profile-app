@@ -1,0 +1,58 @@
+<!DOCTYPE>
+<html>
+</html>
+<head>
+  <title>Test</title>
+</head>
+<body>
+  <script>
+    console.log('Beginning script');
+    const CLIENT_PUBLIC_KEY = `PNgtW8zZiyhzxyRHtwtDjFMU4H_DA2_vSNJhillTjNU`;
+    const REDIRECT_URL = `http://localhost:3000/auth/`
+                       + `token.html?client_key=${CLIENT_PUBLIC_KEY}`;
+
+    (function extractTokenFromQueryParam() {
+        console.log('Running extractTokenFromQueryParam');
+        let url = new URL(window.location);
+        if (url.searchParams.has('token')) {
+            console.log('Query Params have token. Extracting');
+            let token = url.searchParams.get('token');
+            window.sessionStorage.setItem('token', token);
+            url.searchParams.delete('token');
+
+            window.location = url.toLocaleString();
+        }
+    })();
+
+
+    /*
+     * Renew expired tokens by going back to BadgeBook.
+     */
+    (function renewExpiredToken() {
+        console.log('Running renewExpiredToken');
+        let token = window.sessionStorage.getItem('token');
+        if (token && JSON.parse(atob(token.split('.')[1])).exp < Date.now()) {
+            console.log('Token expired');
+            loginWithBadgeBook()
+        }
+    })();
+
+
+    /*
+     * Call to have the user log in with BadgeBook and return with an access token.
+     */
+    function loginWithBadgeBook() {
+        console.log('Running loginWithBadgeBook');
+        let currentUrl  = btoa(window.location);
+        window.location = REDIRECT_URL + `&redirect=${currentUrl}`;
+    }
+
+
+    /*
+     * Helper for grabbing the current token
+     */
+    window.getToken = function() {
+        return window.sessionStorage.getItem('token');
+    }
+  </script>
+</body>
