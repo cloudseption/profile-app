@@ -47,10 +47,10 @@ View.prototype = {
     display_permission_request: function(sender, data) {
         this.permission_request_title.innerHTML = `${data.displayName} needs permission to...`
         this.client_app_name.innerHTML = data.displayName;
-        this.client_app_homepage.innerHTML = data.appUrl;
-        this.client_app_homepage.href = data.appUrl;
+        this.client_app_homepage.innerHTML = data.url;
+        this.client_app_homepage.href = data.url;
 
-        data.scopes.forEach(scope => {
+        data.requiredResources.forEach(scope => {
             let element = document.createElement("li");
             let text = document.createTextNode(scope);
             element.appendChild(text);

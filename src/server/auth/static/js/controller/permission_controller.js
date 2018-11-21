@@ -48,7 +48,6 @@ Controller.prototype = {
                     // Redirect to login
                 } else {
                     authToken = session.getIdToken().getJwtToken();
-                    
                     self.authToken = authToken;
                     resolve(authToken);
                 }
@@ -60,11 +59,12 @@ Controller.prototype = {
     request_app_metadata: function () {
         let appId = (new URLSearchParams(document.location.search)).get('appId');
 
-        let url = `${window.location.origin}/auth/api/1.0.0/permission/${appId}`;
+        let url = `${window.location.origin}/api/apps/${appId}`;
 
         return fetch(url)
             .then(response => response.json())
             .then(responseJson => {
+                console.log(responseJson);
                 if (responseJson.error) {
                     throw new Error(responseJson.error);
                 }
