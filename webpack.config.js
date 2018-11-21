@@ -1,11 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+
 
 const outputDirectory = 'dist';
 
 module.exports = {
-  entry: ["babel-polyfill", "./src/client/index.js"],
+  entry: ["./src/client/index.js"],
   output: {
     path: path.join(__dirname, outputDirectory),
     filename: "bundle.js"
@@ -13,13 +15,21 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx|css)$/,
         include: path.join(__dirname, "/src/client"),
         exclude: /node_modules/,
         use: {
           loader: "babel-loader"
         }
       },
+      // {
+      //   test: /\.js$/,
+      //   include: path.join(__dirname, "/src/client"),
+      //   exclude: /node_modules/,
+      //   use: {
+      //     loader: "babel-loader"
+      //   }
+      // },
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"]
@@ -35,34 +45,27 @@ module.exports = {
     open: true,
     proxy: [
       {
-        context: [
-          "/api",
-          "/auth",
-        ],
+        context: ["/api", "/auth"],
         target: "http://localhost:8080"
       },
       {
-        context: [
-          "**",
-          "!/api",
-          "!/auth",
-        ],
+        context: ["**", "!/api", "!/auth"],
         target: "http://localhost:3000",
         pathRewrite: {
-          '^/.*': function (path, req) {
+          "^/.*": function(path, req) {
             // console.log("REWRITE");
             let output;
             if (/([^/])+\.([^/])+$/.test(path)) {
               // console.log('OTHER FILE');
-              output = '/' + /([^/])*\/?$/.exec(path)[0];
+              output = "/" + /([^/])*\/?$/.exec(path)[0];
             } else {
               // console.log('ENDPOINT - SEND TO INDEX.HTML');
-              output = '/index.html';
+              output = "/index.html";
             }
             // console.log(output);
             return output;
           }
-        },
+        }
       }
     ]
   },
@@ -71,6 +74,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./public/index.html",
       favicon: "./public/favicon.ico"
+    }),
+    new CopyWebpackPlugin([{ from: "src/client/components/*", to: "dist" }], {
+      debug: "info"
     })
   ]
 };

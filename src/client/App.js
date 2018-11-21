@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './app.css';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import NavBar from './components/navbar';
+// import NavBar from './components/navbar';
 import PublicProfile from './components/publicProfile';
 import Home from './components/home';
 import About from './components/about';
@@ -9,12 +9,26 @@ import About from './components/about';
 import cognitoConfig from './config/cognitoConfig';
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
 import SearchContainer from './components/searchContainer';
+import Toolbar from "./components/Toolbar";
+import SideDrawer from "./components/SideDrawer";
+import Backdrop from "./components/Backdrop";
 
 const userPool = new CognitoUserPool(cognitoConfig);
 
 export default class App extends Component {
   state = {
-    currentUserToken: {}
+    currentUserToken: {},
+    sideDrawerOpen: false
+  }
+
+  drawerToggleClickHandler = () => {
+    this.setState((prevState) => {
+      return { sideDrawerOpen: !prevState.sideDrawerOpen };
+    })
+  };
+
+  backdropClickHandler = () => {
+    this.setState({ sideDrawerOpen: false });
   }
 
   componentDidMount() {
@@ -26,18 +40,30 @@ export default class App extends Component {
   }
 
   render() {
-    return <Router>
-        <div>
-        <NavBar />
-          <Switch>
-            <Route path="/profile/:handle" component={PublicProfile} />
-            <Route path="/about" component={About} />
-            <Route path="/home" component={Home} />
-            <Route path="/search" component={SearchContainer} />
-            <Route path="/" component={Home} />
-          </Switch>
-        </div>
-      </Router>;
+    let backdrop;
+
+    if (this.state.sideDrawerOpen) {
+      backdrop = <Backdrop click={this.backdropClickHandler} />;
+    }
+
+    return (
+      <div className="App" style={{ height: '100%' }}>
+        <Toolbar drawerClickHandler={this.drawerToggleClickHandler} />
+        <SideDrawer show={this.state.sideDrawerOpen} />
+        {backdrop}
+        <main style={{ marginTop: '64px' }}>
+          <Router>
+            <Switch>
+              <Route path="/profile/:handle" component={PublicProfile} />
+              <Route path="/about" component={About} />
+              <Route path="/home" component={Home} />
+              <Route path="/search" component={SearchContainer} />
+              <Route path="/" component={Home} />
+            </Switch>
+          </Router>
+        </main>
+      </div>
+    );
   }
 
   /*
