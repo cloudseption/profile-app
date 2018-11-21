@@ -1,8 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const Axios = require('axios');
 
 const User = require('../models/user');
+const App = require('../models/app');
+const PermissionSet = require('../models/permissionSet');
+
+const BADGE_PERMISSION = 'DISPLAY:badge';
+const LANDING_PAGE_PERMISSION = 'DISPLAY:landing-page';
 
 router.get('/', (req, res, next) => {
     User.find()
@@ -177,6 +183,142 @@ router.get('/:userId', (req, res, next) => {
         res.status(500).json({ error: err });
     });
 });
+
+/**
+ * Queries all attached apps and returns their badgeData for the given user.
+ */
+router.get('/:userId/badge-data', (req, res, next) => {
+    let userId = req.params.userId;
+
+    App.find()
+    .exec()
+    .then(appsData => {
+        let requestPromises = [];
+        appsData.forEach(async (appData) => {
+            let appId           = appData.appId;
+            let badgeEndpoint   = appData.badgeEndpoint;
+            let appToken        = appData.appToken;
+            let permission      = BADGE_PERMISSION;
+
+            if (badgeEndpoint) {
+                requestPromises.push(
+                    didUserAuthorizeApp(userId, appId, permission)
+                    .then(permissionGranted => {
+                        return permissionGranted
+                            ? getBadgeData(appId, badgeEndpoint, appToken, userId)
+                            : [];
+                    })
+                );
+            }
+        });
+
+        return Promise.all(requestPromises);
+    })
+    .then(responses => {
+        console.log('Joining responses');
+        let results = [];
+        responses.forEach(response => {
+            if (response) {
+                results = results.concat(response);
+            }
+        });
+        res.status(200).json(results);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+});
+
+/**
+ * Queries all attached apps and returns their landingData for the given user.
+ */
+router.get('/:userId/landing-data', (req, res, next) => {
+    let userId = req.params.userId;
+
+    App.find()
+    .exec()
+    .then(appsData => {
+        let requestPromises = [];
+        appsData.forEach(async (appData) => {
+            let appId           = appData.appId;
+            let landingEndpoint = appData.landingEndpoint;
+            let appToken        = appData.appToken;
+            let permission      = LANDING_PAGE_PERMISSION;
+
+            if (landingEndpoint) {
+                requestPromises.push(
+                    didUserAuthorizeApp(userId, appId, permission)
+                    .then(permissionGranted => {
+                        return permissionGranted
+                            ? getLandingData(appId, landingEndpoint, appToken, userId)
+                            : [];
+                    })
+                );
+            }
+        });
+        return Promise.all(requestPromises);
+    })
+    .then(responses => {
+        let results = [];
+        responses.forEach(response => {
+            if (response) {
+                results = results.concat(response);
+            }
+        });
+        res.status(200).json(results);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+});
+
+/**
+ * Requests badge page data from the given remote app's endpoint.
+ */
+function getBadgeData(appId, badgeEndpoint, appToken, userId) {
+    return Axios.post(badgeEndpoint, {},
+        {
+            headers: {
+            'authorization' : appToken,
+            'UserId' : userId
+        }
+    })
+    .then(res => res.data.badgeData)
+    .catch(err => { console.log(`Error hitting badge endpoint for ${appId}: ${err.message} - Skipping`); });
+}
+
+/**
+ * Requests landing page data from the given remote app's endpoint.
+ */
+function getLandingData(appId, landingEndpoint, appToken, userId) {
+    return Axios.post(landingEndpoint, {},
+        {
+            headers: {
+            'Authorization' : appToken,
+            'UserId' : userId
+        }
+    })
+    .then(res => res.data.landingData)
+    .catch(err => { console.log(`Error hitting landing endpoint for ${appId}: ${err.message} - Skipping`); });
+}
+
+/**
+ * Checks if the user granted the given app permission.
+ */
+function didUserAuthorizeApp(userId, appId, permission) {
+    console.log("didUserAuthorizeApp");
+    return PermissionSet.findOne({ clientId: appId, resourceId: userId })
+    .exec()
+    .then(permissionSet => {
+        let permissionResult = Boolean(permissionSet) && permissionSet.permissions.includes(permission);
+        return permissionResult;
+    })
+    .then(result => {
+        console.log('Permissions: ', result);
+        // return result;       // Uncomment this when ready to do actual permission checking
+        return true;
+    })
+}
 
 router.patch('/:userId', (req, res, next) => {
     const id = req.params.userId;
