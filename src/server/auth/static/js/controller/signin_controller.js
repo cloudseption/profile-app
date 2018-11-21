@@ -68,7 +68,12 @@ Controller.prototype = {
                     document.cookie = cname + "=" + value;
                 })('cognitoToken', idToken, 365);
 
-                window.location.href = mainUrl;
+                // Redirect
+                let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
+                let redirect = redirect64
+                             ? atob(redirect64)
+                             : `${window.location.origin}/`;
+                window.location = redirect;
             },
             function signin_error(err) {
                 document.getElementById("signin_error_message").style.display = "block";

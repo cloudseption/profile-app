@@ -33,7 +33,7 @@ $(function () {
             return token;
         } else {
             let redirect = btoa(window.location);
-            window.location.href = `index.html?redirect=${redirect}`;
+            window.location.href = `login.html?redirect=${redirect}`;
         }
     })
     .then(function getSignedAccessTokenFromServer(authToken) {

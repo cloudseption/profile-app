@@ -1,7 +1,7 @@
 var Controller = function(model, view, authToken) {
     this.model = model;
     this.view = view;
-    this.signinUrl = "index.html";
+    this.signinUrl = "login.html";
 
     this.poolData = {
         UserPoolId: _config.cognito.userPoolId,
