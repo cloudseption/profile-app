@@ -26,9 +26,10 @@ export default class App extends Component {
   }
 
   render() {
-    return <Router>
-        <div>
+    return (
+      <div>
         <NavBar />
+          <Router>
           <Switch>
             <Route path="/profile/:handle" component={PublicProfile} />
             <Route path="/about" component={About} />
@@ -36,8 +37,9 @@ export default class App extends Component {
             <Route path="/search" component={SearchContainer} />
             <Route path="/" component={Home} />
           </Switch>
-        </div>
-      </Router>;
+        </Router>
+      </div>
+    );
   }
 
   /*

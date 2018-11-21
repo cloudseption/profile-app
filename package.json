@@ -23,6 +23,8 @@
     "bootstrap": "^4.1.2",
     "cognito-express": "^2.0.12",
     "cookie-parser": "^1.4.3",
+    "copy-webpack-plugin": "^4.6.0",
+    "directory-named-webpack-plugin": "^4.0.0",
     "dotenv": "^6.1.0",
     "esm": "^3.0.84",
     "express": "^4.16.3",
