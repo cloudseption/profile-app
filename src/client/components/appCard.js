@@ -28,7 +28,7 @@ class AppCard extends Component {
     
     state = {  
         appName: this.props.appName,
-        imgurl: this.props.imgurl,
+        imgUrl: this.props.imgUrl,
         data: this.props.data
     }
 
@@ -46,7 +46,7 @@ class AppCard extends Component {
                             <Button variant="contained" color="primary" > 
                                 To App 
                             </Button>
-                            
+
                             </ListItem>
                         </List>
                         <Typography>

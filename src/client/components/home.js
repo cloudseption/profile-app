@@ -10,7 +10,12 @@ class Home extends Component {
             {
                 appName: "app1",
                 imgurl: "https://png.icons8.com/app",
-                appUrl: "",
+                data: ["app data"]
+            },
+
+            {
+                appName: "app1",
+                imgurl: "https://png.icons8.com/app",
                 data: ["app data"]
             }
         ]
