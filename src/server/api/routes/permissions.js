@@ -38,6 +38,7 @@ router.post('/:clientId/:resourceId', (req, res, next) => {
         console.log(result);
         res.status(201).json({
             message: "Handling POST requests to /permissionSets",
+            permission: 'GRANTED',
             createdPermissionSet: result
         });
     })

@@ -9,7 +9,7 @@ const PermissionSet = require('../models/permissionSet');
 router.get('/token', async function getAccessToken(req, res, next) {
     try {
         let userId      = await req.clientId;
-        let user        = await (User.findOne({ userId: userId })).exec();
+        let user        = await User.findOne({ userId: userId }).exec();
         let app         = await App.findOne({ clientKey: req.headers.client_key }).exec();
         let appId       = app.appId;
         let permissions = await PermissionSet.findOne({ clientId: appId, resourceId: userId }).exec();
@@ -31,15 +31,16 @@ router.get('/token', async function getAccessToken(req, res, next) {
                 .final();
             })
             .then(jws => {
+                console.log(`Access token generated for app ${appId} and user ${userId}`);
                 res.status(200).json({ accesstoken: jws });
             });
         }
         else {
             console.log(`User ${userId} not enrolled in app ${appId}`);
             res.status(401).json({
-                message: 'NEED_PERMISSION',
+                notice: 'NEED_PERMISSION',
                 userId: userId,
-                appId: client.appId
+                appId: appId
             });
         }
     } catch (err) {
