@@ -7,6 +7,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
     root: {
@@ -19,11 +20,17 @@ const styles = theme => ({
 
     badge: {
        margin: '20px'
-    }
+    },
+    
 });
 
-class Home extends Component {
-    state = {  }
+class AppCard extends Component {
+    
+    state = {  
+        appName: this.props.appName,
+        imgurl: this.props.imgurl,
+        data: this.props.data
+    }
 
     render() { 
         const { classes } = this.props;
@@ -34,22 +41,34 @@ class Home extends Component {
                     <CardContent>
                         <List>
                             <ListItem>
-                            <Avatar src="https://png.icons8.com/app"/>
-                            <ListItemText primary={"appName"}/>
-                            <Avatar className={classes.badge} src="https://png.icons8.com/app"/>
-                            <Avatar className={classes.badge} src="https://png.icons8.com/app"/>
-                            <Avatar className={classes.badge} src="https://png.icons8.com/app"/>
+                            <Avatar src={this.getImgUrl()}/>
+                            <ListItemText primary={this.getAppName()}/>
+                            <Button variant="contained" color="primary" > 
+                                To App 
+                            </Button>
+                            
                             </ListItem>
                         </List>
                         <Typography>
-                           app data
+                           {this.getData()}
                         </Typography>
                     </CardContent>
                 </Card>
             </div>
-
         );
+    }
+
+    getAppName = () => {
+        return this.state.appName;
+    }
+
+    getImgUrl = () => {
+        return this.state.imgurl;
+    }
+
+    getData = () => {
+        return this.state.data;
     }
 }
  
-export default withStyles(styles)(Home);
+export default withStyles(styles)(AppCard);
