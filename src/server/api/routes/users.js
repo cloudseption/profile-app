@@ -279,8 +279,8 @@ function getBadgeData(appId, badgeEndpoint, appToken, userId) {
     return Axios.post(badgeEndpoint, {},
         {
             headers: {
-            'authorization' : appToken,
-            'UserId' : userId
+            'Authorization' : appToken,
+            'userid' : userId
         }
     })
     .then(res => res.data.badgeData)
@@ -295,7 +295,7 @@ function getLandingData(appId, landingEndpoint, appToken, userId) {
         {
             headers: {
             'Authorization' : appToken,
-            'UserId' : userId
+            'userid' : userId
         }
     })
     .then(res => res.data.landingData)

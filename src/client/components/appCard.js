@@ -25,12 +25,7 @@ const styles = theme => ({
 });
 
 class AppCard extends Component {
-    
-    state = {  
-        appName: this.props.appName,
-        imgurl: this.props.imgurl,
-        data: this.props.data
-    }
+
 
     render() { 
         const { classes } = this.props;
@@ -41,16 +36,15 @@ class AppCard extends Component {
                     <CardContent>
                         <List>
                             <ListItem>
-                            <Avatar src={this.getImgUrl()}/>
-                            <ListItemText primary={this.getAppName()}/>
+                            <Avatar src={this.props.imgurl}/>
+                            <ListItemText primary={this.props.appName}/>
                             <Button variant="contained" color="primary" > 
                                 To App 
                             </Button>
-                            
                             </ListItem>
                         </List>
                         <Typography>
-                           {this.getData()}
+                           {this.props.data}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -58,17 +52,6 @@ class AppCard extends Component {
         );
     }
 
-    getAppName = () => {
-        return this.state.appName;
-    }
-
-    getImgUrl = () => {
-        return this.state.imgurl;
-    }
-
-    getData = () => {
-        return this.state.data;
-    }
 }
  
 export default withStyles(styles)(AppCard);

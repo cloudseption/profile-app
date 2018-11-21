@@ -9,7 +9,7 @@ class Home extends Component {
     state = {  
         landingPageData : [
             {
-                appName: "app1",
+                appName: "Test",
                 imgurl: "https://png.icons8.com/app",
                 appUrl: "",
                 data: ["app data"]
@@ -17,18 +17,27 @@ class Home extends Component {
         ]
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
         let headers = {
             'Content-Type': 'application/json',
             'Authorization': '$&tiduh3%gfg',
             'Userid': 'c810f3c1-dd7d-4085-b85a-4839713d6c1b'
     
         }
-        axios.post("https://obbzuk8g48.execute-api.us-west-2.amazonaws.com/prod/api/landing",
+        axios.get("http://localhost:3000/api/users/c810f3c1-dd7d-4085-b85a-4839713d6c1b/landing-data",
         {},
         {headers: headers}
         
-        );
+        )
+        .then(response => {
+            console.log(this.state.landingPageData);
+            const landingPageData = response.data
+            
+            this.setState({
+                landingPageData   
+            });
+            console.log(this.state.landingPageData)
+        });
     }
 
     render() { 
