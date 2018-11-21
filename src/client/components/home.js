@@ -1,55 +1,33 @@
 import React, { Component } from 'react';
-import Card from '@material-ui/core/Card';
-import { CardContent } from '@material-ui/core';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Avatar from '@material-ui/core/Avatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-
-const styles = theme => ({
-    root: {
-      width: '100%',
-      maxWidth: 700,
-      backgroundColor: theme.palette.background.paper,
-      margin: 'auto',
-      padding: '20px'
-    },
-
-    badge: {
-       margin: '20px'
-    }
-});
+import AppCard from './appCard.js';
+import Button from '@material-ui/core/Button';
 
 class Home extends Component {
-    state = {  }
+    
+    state = {  
+        landingPageData : [
+            {
+                appName: "app1",
+                imgurl: "https://png.icons8.com/app",
+                appUrl: "",
+                data: ["app data"]
+            }
+        ]
+    }
 
     render() { 
-        const { classes } = this.props;
-
         return (      
-            <div className={classes.root}>
-                <Card>
-                    <CardContent>
-                        <List>
-                            <ListItem>
-                            <Avatar src="https://png.icons8.com/app"/>
-                            <ListItemText primary={"appName"}/>
-                            <Avatar className={classes.badge} src="https://png.icons8.com/app"/>
-                            <Avatar className={classes.badge} src="https://png.icons8.com/app"/>
-                            <Avatar className={classes.badge} src="https://png.icons8.com/app"/>
-                            </ListItem>
-                        </List>
-                        <Typography>
-                           app data
-                        </Typography>
-                    </CardContent>
-                </Card>
+            <div>
+            <Button variant="contained" color="primary">Profile</Button>
+            <List>
+            {this.state.landingPageData.map(appData => (
+                <AppCard appName={appData.appName} imgurl={appData.imgurl} data={appData.data}/>                
+            ))}
+            </List>
             </div>
-
         );
     }
 }
  
-export default withStyles(styles)(Home);
+export default Home;
