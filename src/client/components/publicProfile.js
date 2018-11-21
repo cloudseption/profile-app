@@ -9,35 +9,17 @@ import axios from "axios";
 class PublicProfile extends Component {
   // Hardcoded badgedata for now
   state = {
-    badgeData: [
-      {
-        id: `1`,
-        appUrl: `http://www.google.ca`,
-        iconUrl: `https://static.thenounproject.com/png/2576-200.png`,
-        text: `lorem ipsum boogie 5%`
-      },
-      {
-        id: `2`,
-        appUrl: `http://www.google.ca`,
-        iconUrl: `https://static.thenounproject.com/png/2576-200.png`,
-        text: `6% more awesome than our prof`
-      },
-      {
-        id: `3`,
-        appUrl: `http://www.google.ca`,
-        iconUrl: `https://static.thenounproject.com/png/2576-200.png`,
-        text: `iggie wigge whatever`
-      }
-    ],
+    badgeData: [],
     profile: {}
   };
 
   componentDidMount() {
     const {handle} = this.props.match.params;
 
+    // Get main profile page data
     axios
       .get(
-      `http://localhost:8080/users/${handle}`
+        `${document.location.protocol}//${document.location.host}/api/users/${handle}`
       )
       .then(res => {
         try {
@@ -50,6 +32,15 @@ class PublicProfile extends Component {
           }
         } catch (e) {
           console.log(e);
+        }
+      });
+
+    // Get badge data
+    const badgeUrl = `${document.location.protocol}//${document.location.host}/api/users/${handle}/badge-data`;
+    axios.get(badgeUrl)
+      .then(res => {
+        if (res && res.data) {
+          this.setState({ badgeData: res.data });
         }
       });
     }
