@@ -1,6 +1,6 @@
 const AuthProviderSingleton = require('./authProvider/AuthProvider').AuthProviderSingleton;
 
-const handleRequest = async function handleRequest(req, res) {
+const handleRequest = async function handleRequest(req, res, next) {
     let authProvider = AuthProviderSingleton.getInstance();    
     let cognitoToken = req.headers.authorization;
     if (!cognitoToken) {
