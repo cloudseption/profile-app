@@ -6,7 +6,7 @@ var Controller = function(model, view, authToken) {
     if (redirect64) {
         this.mainUrl = atob(redirect64);
     } else {
-        this.mainUrl = "main.html";
+        this.mainUrl = `${window.location.origin}`;
     }
 
     this.poolData = {
