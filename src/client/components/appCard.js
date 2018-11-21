@@ -7,7 +7,6 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import {Link} from 'react-router-dom';
 
 const styles = theme => ({
     root: {
@@ -21,6 +20,7 @@ const styles = theme => ({
     badge: {
        margin: '20px'
     },
+    
 });
 
 class AppCard extends Component {
@@ -66,9 +66,6 @@ class AppCard extends Component {
         </List>
        )
     }
-
-   
-    
 }
  
 export default withStyles(styles)(AppCard);
