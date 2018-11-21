@@ -298,7 +298,7 @@ function getLandingData(appId, landingEndpoint, appToken, userId) {
             'UserId' : userId
         }
     })
-    .then(res => res.data.badgeData)
+    .then(res => res.data.landingData)
     .catch(err => { console.log(`Error hitting landing endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
