@@ -17,10 +17,10 @@ class Home extends Component {
             this.setState({
                 landingPageData: [
                     {
-                        appName: "Tiny Tank Game",
+                        appName: response.data[2].name,
                         imgUrl: "https://png.icons8.com/app",
                         appUrl: "",
-                        text: 'This apps top score'
+                        text: response.data[2].data[0]
                     },
                     {
                         appName: response.data[1].name,
