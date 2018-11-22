@@ -8,7 +8,7 @@
   <script>
     console.log('Beginning script');
     const CLIENT_PUBLIC_KEY = `PNgtW8zZiyhzxyRHtwtDjFMU4H_DA2_vSNJhillTjNU`;
-    const REDIRECT_URL = `http://localhost:3000/auth/`
+    const REDIRECT_URL = `${window.location.origin}/auth/`
                        + `token.html?client_key=${CLIENT_PUBLIC_KEY}`;
 
     (function extractTokenFromQueryParam() {
