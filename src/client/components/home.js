@@ -10,12 +10,6 @@ class Home extends Component {
     }
 
     componentDidMount = () => {
-        let headers = {
-            'Content-Type': 'application/json',
-            'Authorization': '$&tiduh3%gfg',
-            'Userid': 'c810f3c1-dd7d-4085-b85a-4839713d6c1b'
-    
-        }
         axios.get(`http://localhost:3000/api/users/${window.localStorage.userId}/landing-data`)
         .then(response => {
             console.log(response.data);
@@ -29,10 +23,9 @@ class Home extends Component {
                         text: 'This apps top score'
                     },
                     {
-                        appName: "Quiz App",
-                        imgUrl: "https://png.icons8.com/app",
-                        appUrl: "",
-                        text: 'This apps top score'
+                        appName: response.data[1].name,
+                        imgUrl: response.data[1]['img-url'],
+                        text: response.data[1].data[0]
                     },
                     {
                         appName: response.data[0].name,
