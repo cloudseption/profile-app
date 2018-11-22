@@ -18,7 +18,7 @@ class PublicProfile extends Component {
   };
 
   componentDidMount() {
-    const {handle} = this.props.match.params;
+    const { handle } = this.props.match.params;
     this.setState({ userId: window.localStorage.userId });
     // Get main profile page data
     axios
@@ -47,10 +47,10 @@ class PublicProfile extends Component {
           this.setState({ badgeData: res.data });
         }
       });
-    }
-  
+  }
+
   handleButton() {
-    if(!this.state.isEdit) {
+    if (!this.state.isEdit) {
       this.editPage();
     } else {
       this.saveUser();
@@ -58,7 +58,7 @@ class PublicProfile extends Component {
   }
 
   editPage() {
-    this.setState({isEdit: true})
+    this.setState({ isEdit: true })
   }
 
   saveUser() {
@@ -71,7 +71,13 @@ class PublicProfile extends Component {
       .patch(`http://localhost:8080/users/${this.state.userId}`,
         data
       );
-    this.setState( {isEdit: false});
+    this.setState({ isEdit: false });
+  }
+
+  handleNameChange(event) {
+    let prof = this.state.profile;
+    prof.name = event.target.value;
+    this.setState({ profile: prof });
   }
 
   render() {
@@ -82,20 +88,7 @@ class PublicProfile extends Component {
             <div className="col-12">
               {!this.state.isEdit ? (
                 <Name value={this.state.profile.name} />) : (
-                  <CKEditor
-                    editor={InlineEditor}
-                    data={this.state.profile.name}
-                    onInit={editor => {
-                      // You can store the "editor" and use when it is needed.
-                      console.log('Editor is ready to use!', editor);
-                    }}
-                    onChange={(event, editor) => {
-                      const data = editor.getData();
-                      let prof = this.state.profile;
-                      prof.name = data;
-                      this.setState({ profile: prof })
-                    }}
-                  />)}
+                  <h4><input type="text" value={this.state.profile.name} onChange={this.handleNameChange.bind(this)} /></h4>)}
             </div>
 
           </div>
@@ -129,7 +122,7 @@ class PublicProfile extends Component {
       </div>
       {this.state.currUser &&
         <div className="col-sm-9">
-          <button onClick={this.handleButton.bind(this)}>{this.state.isEdit? "Save" : "Edit"}</button>
+          <button onClick={this.handleButton.bind(this)}>{this.state.isEdit ? "Save" : "Edit"}</button>
         </div>}
     </React.Fragment>;
   }
