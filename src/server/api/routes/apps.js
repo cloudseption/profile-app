@@ -58,7 +58,7 @@ router.get('/:appId', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    let appName  = req.body.name;
+    let appName  = req.body.appId;
 
     App.find({ name: appName })
     .exec()

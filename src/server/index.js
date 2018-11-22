@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const os = require('os');
+const path = require('path');
 const auth = require('./auth/router');
 const apiRouter = require('./api/router');
 const morgan = require('morgan');
@@ -41,9 +42,11 @@ securityFilter.registerPublicRoute('*:/api/users/*');
 securityFilter.registerPublicRoute('*:/auth/*');
 securityFilter.registerPublicRoute('*:/user/*');
 securityFilter.registerPublicRoute('*:/users/*');
+securityFilter.registerPublicRoute('*:/profile/*');
+securityFilter.registerPublicRoute('GET:/');
+securityFilter.registerPublicRoute('GET:/about');
+securityFilter.registerPublicRoute('GET:/search');
 app.use(securityFilter);
-
-app.use(express.static('dist'));
 
 // Add CORS headers to request
 app.use((req, res, next) => {
@@ -60,6 +63,21 @@ app.use((req, res, next) => {
 app.use('/auth', auth);
 app.use('/api', apiRouter);
 app.use('/users', userRoutes);
+
+// Please keep this middleware. It is important!
+app.use(/^(\/([^api]|[^auth]).*)/, function allowArbitraryPathingForReact(req, res, next) {
+  let fileName = /([^/])+\.([^/])+$/.exec(req.baseUrl);
+  
+  if (fileName) {
+    fileName = fileName[0];
+  } else {
+    fileName = 'index.html';
+  }
+
+  let pathToFile = path.normalize(__dirname + '/../../dist/' + fileName);
+  res.sendFile(pathToFile);
+});
+app.use(express.static('dist'));
 
 // Middleware to catch all errors
 app.use((req, res, next) => {
