@@ -27,7 +27,7 @@ $(function () {
             authToken = token;
             window.localStorage.setItem('cognitoToken', token)
         } else {
-            window.location.href = 'index.html';
+            window.location.href = 'login.html';
         }
     }).catch(function handleTokenError(error) {
         

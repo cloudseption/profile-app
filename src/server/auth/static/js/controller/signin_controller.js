@@ -6,7 +6,7 @@ var Controller = function(model, view, authToken) {
     if (redirect64) {
         this.mainUrl = atob(redirect64);
     } else {
-        this.mainUrl = "main.html";
+        this.mainUrl = `${window.location.origin}`;
     }
 
     this.poolData = {
@@ -54,8 +54,26 @@ Controller.prototype = {
     handle_sign_in: function(sender, args) {
         let mainUrl = this.mainUrl;
         this.signin(args.email, args.password,
-            function signin_success() {
-                window.location.href = mainUrl;
+            function signin_success(result) {
+                console.log('signin success', result);
+                let idToken = result.idToken.jwtToken;
+                let userId  = result.idToken.payload.sub;
+
+                // I don't think I need this...
+                (function saveCookie(cname, cvalue, exdays) {
+                    let d = new Date();
+                    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                    let expires = "expires="+ d.toUTCString();
+                    let value = cvalue + ";" + expires + ";path=/"
+                    document.cookie = cname + "=" + value;
+                })('cognitoToken', idToken, 365);
+
+                // Redirect
+                let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
+                let redirect = redirect64
+                             ? atob(redirect64)
+                             : `${window.location.origin}/`;
+                window.location = redirect;
             },
             function signin_error(err) {
                 document.getElementById("signin_error_message").style.display = "block";

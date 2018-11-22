@@ -33,15 +33,13 @@ $(function () {
             return token;
         } else {
             let redirect = btoa(window.location);
-            window.location.href = `index.html?redirect=${redirect}`;
+            window.location.href = `login.html?redirect=${redirect}`;
         }
     })
     .then(function getSignedAccessTokenFromServer(authToken) {
         console.log('Requesting signed access token');
         const appKey = (new URLSearchParams(document.location.search)).get('client_key');
-        const url = `${window.location.origin}/auth/api/1.0.0/token`;
-
-        console.log(authToken);
+        const url = `${window.location.origin}/api/auth/token`;
 
         return fetch(url,
             {
@@ -63,6 +61,7 @@ $(function () {
         }
     })
     .then(function returnUserViaRedirect(jsonResponse) {
+        let permission = jsonResponse.permission;
         if (jsonResponse.error) {
             console.log(jsonResponse.error);
         }
@@ -77,7 +76,6 @@ $(function () {
         else {
             console.log('Triggering redirect');
             let accessToken = jsonResponse.accesstoken;
-            console.log(accessToken);
             let tokenParam = `token=${accessToken}&permission=${permission}`;
             
             let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');

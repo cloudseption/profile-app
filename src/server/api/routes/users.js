@@ -279,7 +279,7 @@ function getBadgeData(appId, badgeEndpoint, appToken, userId) {
     return Axios.post(badgeEndpoint, {},
         {
             headers: {
-            'authorization' : appToken,
+            'Authorization' : appToken,
             'UserId' : userId
         }
     })

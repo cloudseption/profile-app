@@ -1,7 +1,7 @@
 var Controller = function(model, view, authToken) {
     this.model = model;
     this.view = view;
-    this.signinUrl = "index.html";
+    this.signinUrl = "login.html";
 
     this.poolData = {
         UserPoolId: _config.cognito.userPoolId,
@@ -66,14 +66,14 @@ Controller.prototype = {
                 function verifySuccess(result) {
                     let idToken = result.idToken.jwtToken;
     
-                    // // I don't think I need this...
-                    // (function saveCookie(cname, cvalue, exdays) {
-                    //     let d = new Date();
-                    //     d.setTime(d.getTime() + (exdays*24*60*60*1000));
-                    //     let expires = "expires="+ d.toUTCString();
-                    //     let value = cvalue + ";" + expires + ";path=/"
-                    //     document.cookie = cname + "=" + value;
-                    // })('cognitoToken', idToken, 365);
+                    // I don't think I need this...
+                    (function saveCookie(cname, cvalue, exdays) {
+                        let d = new Date();
+                        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                        let expires = "expires="+ d.toUTCString();
+                        let value = cvalue + ";" + expires + ";path=/"
+                        document.cookie = cname + "=" + value;
+                    })('cognitoToken', idToken, 365);
 
                     let body = {
                         email: args.email,

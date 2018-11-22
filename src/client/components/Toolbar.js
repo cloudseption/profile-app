@@ -22,6 +22,9 @@ const toolbar = props => (
             <a href="/home">Landing Page</a>
           </li>
           <li>
+            <a href="/auth/login.html">Login</a>
+          </li>
+          <li>
             <a href="/logout">Logout</a>
           </li>
         </ul>
