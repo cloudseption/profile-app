@@ -11,7 +11,6 @@ class PublicProfile extends Component {
   // Hardcoded badgedata for now
   state = {
     badgeData: [],
-    profile: {}
     profile: {},
     userId: null,
     currUser: false
@@ -19,7 +18,7 @@ class PublicProfile extends Component {
 
   componentDidMount() {
     const {handle} = this.props.match.params;
-
+    this.setState({ userId: window.localStorage.userId });
     // Get main profile page data
     axios
       .get(
@@ -31,7 +30,6 @@ class PublicProfile extends Component {
           if (profile) {
             let currUser = this.state.userId === profile.userId;
             this.setState({ profile, currUser });
-            console.log(this.state.currUser);
           } else {
             this.setState({ profile: {} });
           }
