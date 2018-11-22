@@ -280,11 +280,7 @@ function getBadgeData(appId, badgeEndpoint, appToken, userId) {
         {
             headers: {
             'Authorization' : appToken,
-<<<<<<< HEAD
             'userid' : userId
-=======
-            'UserId' : userId
->>>>>>> develop
         }
     })
     .then(res => res.data.badgeData)
