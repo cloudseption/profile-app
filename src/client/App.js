@@ -48,8 +48,8 @@ export default class App extends Component {
 
     return (
       <div className="App" style={{ height: '100%' }}>
-        <Toolbar drawerClickHandler={this.drawerToggleClickHandler} />
-        <SideDrawer show={this.state.sideDrawerOpen} />
+        <Toolbar signOut={this.signOut} drawerClickHandler={this.drawerToggleClickHandler} />
+        <SideDrawer signOut={this.signOut} show={this.state.sideDrawerOpen} />
         {backdrop}
         <main style={{ marginTop: '64px' }}>
           <Router>
@@ -102,4 +102,11 @@ export default class App extends Component {
       document.cookie = `cognitoToken=${''};expires=${(new Date()).getTime()};path=/`;
     }
   }
+
+  signOut = () => {
+    userPool.getCurrentUser().signOut();
+    this.loadCognitoUserJwt();
+    window.location.href= "/auth/login.html";
+  }
+
 }

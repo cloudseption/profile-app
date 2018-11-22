@@ -28,7 +28,7 @@ const toolbar = props => (
             <a href="/auth/login.html">Login</a>
           </li>
           <li>
-            <a href="/logout">Logout</a>
+            <a onClick={props.signOut} href="#">Logout</a>
           </li>
         </ul>
       </div>
