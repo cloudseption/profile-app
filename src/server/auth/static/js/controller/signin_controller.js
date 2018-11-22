@@ -80,6 +80,9 @@ Controller.prototype = {
                     body: JSON.stringify({ message: `User ${userId} logged in` })
                 })
                 .then(result => {
+                    window.localStorage.setItem('userId', userId);
+                })
+                .then(result => {
                     // Redirect
                     let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
                     let redirect = redirect64
