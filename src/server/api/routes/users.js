@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Axios = require('axios');
-
 const User = require('../models/user');
 const App = require('../models/app');
 const PermissionSet = require('../models/permissionSet');
+const log = require('log4js').getLogger();
 
 const BADGE_PERMISSION = 'DISPLAY:badge';
 const LANDING_PAGE_PERMISSION = 'DISPLAY:landing-page';
@@ -63,7 +63,7 @@ router.post('/', (req, res, next) => {
  * finish registering them later.
  */
 router.post('/pre-register', (req, res, next) => {
-    console.log('PRE-REGISTER', req.body);
+    log.info(`/api/users/pre-register ${req.body.name} (${req.body.email})`)
     
     const email = req.body.email;
     const name  = req.body.name;
@@ -280,7 +280,11 @@ function getBadgeData(appId, badgeEndpoint, appToken, userId) {
         {
             headers: {
             'Authorization' : appToken,
+<<<<<<< HEAD
             'userid' : userId
+=======
+            'UserId' : userId
+>>>>>>> develop
         }
     })
     .then(res => res.data.badgeData)

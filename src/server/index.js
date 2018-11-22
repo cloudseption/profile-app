@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const os = require('os');
+const path = require('path');
 const auth = require('./auth/router');
 const apiRouter = require('./api/router');
 const morgan = require('morgan');
@@ -8,14 +9,13 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv").config();
+const log = require('log4js').getLogger();
+log.level = process.env.LOG_LEVEL;
 
+const logEndpoint = require('./log');
 const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
 const appTokenResolver = require('./security/appTokenResolver');
-
-const authProviderSingleton = require('./auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
-authProviderSingleton.config = require('./auth/api/v1_0_0/config');
-authProviderSingleton.init();
 
 const port = process.env.PORT || 8080;
 
@@ -41,9 +41,12 @@ securityFilter.registerPublicRoute('*:/api/users/*');
 securityFilter.registerPublicRoute('*:/auth/*');
 securityFilter.registerPublicRoute('*:/user/*');
 securityFilter.registerPublicRoute('*:/users/*');
+securityFilter.registerPublicRoute('*:/profile/*');
+securityFilter.registerPublicRoute('GET:/');
+securityFilter.registerPublicRoute('GET:/about');
+securityFilter.registerPublicRoute('GET:/search');
+securityFilter.registerPublicRoute('POST:/log');
 app.use(securityFilter);
-
-app.use(express.static('dist'));
 
 // Add CORS headers to request
 app.use((req, res, next) => {
@@ -60,6 +63,24 @@ app.use((req, res, next) => {
 app.use('/auth', auth);
 app.use('/api', apiRouter);
 app.use('/users', userRoutes);
+
+// Little piece of middleware for sending log notifications from the browser.
+app.post('/log', logEndpoint);
+
+// Please keep this middleware. It is important!
+app.use(/^(\/([^api]|[^auth]).*)/, function allowArbitraryPathingForReact(req, res, next) {
+  let fileName = /([^/])+\.([^/])+$/.exec(req.baseUrl);
+  
+  if (fileName) {
+    fileName = fileName[0];
+  } else {
+    fileName = 'index.html';
+  }
+
+  let pathToFile = path.normalize(__dirname + '/../../dist/' + fileName);
+  res.sendFile(pathToFile);
+});
+app.use(express.static('dist'));
 
 // Middleware to catch all errors
 app.use((req, res, next) => {

@@ -16,20 +16,19 @@ class SearchContainer extends Component {
     }
 
     handleGetProfile = searchParams => {
-        console.log("Event handler called", searchParams);
         axios
-            .get(
-                `https://guarded-retreat-70427.herokuapp.com/api/search?input=${searchParams}`
-            )
-            .then(res => {
-                try {
-                    const profiles = res.data;
-                    console.log("profiles", profiles);
-                    this.setState({ profiles });
-                } catch (e) {
-                    console.log(e);
-                }
-            });
+          .get(
+            `https://crowdseption-search-api.herokuapp.com/api/search?input=${searchParams}`
+          )
+          .then(res => {
+            try {
+              const profiles = res.data;
+              console.log("profiles", profiles);
+              this.setState({ profiles });
+            } catch (e) {
+              console.log(e);
+            }
+          });
     }
 }
 

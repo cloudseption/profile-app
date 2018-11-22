@@ -50,7 +50,7 @@ View.prototype = {
         });
         this.verify_button_element.onclick = this.verify_handler;
         this.ok_button_element.onclick = function() {
-            window.location.href = "index.html";
+            window.location.href = "login.html";
         }
     },
 

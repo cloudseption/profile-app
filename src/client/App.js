@@ -79,9 +79,11 @@ export default class App extends Component {
    * to this.state.currentUserToken.payload.sub
    */
   loadCognitoUserJwt = () => {
+    // console.log('loadCognitoUserJwt');
     let cognitoUser = userPool.getCurrentUser();
 
     if (cognitoUser) {
+      // console.log('Found user');
       cognitoUser.getSession((err, session) => {
         let currentUserToken = session.idToken.jwtToken;
         let currentUserId    = session.idToken.payload.sub;
@@ -93,6 +95,11 @@ export default class App extends Component {
         window.localStorage.setItem('userId', currentUserId);
         this.setState({ currentUserId });
       });
+    }
+    else {
+      // console.log('Did not find user');
+      window.localStorage.removeItem('userId');
+      document.cookie = `cognitoToken=${''};expires=${(new Date()).getTime()};path=/`;
     }
   }
 }
