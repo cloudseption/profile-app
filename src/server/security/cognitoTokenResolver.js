@@ -9,6 +9,8 @@ let cognitoExpress = new CognitoExpress({
     tokenUse: 'id'
 });
 
+const knownRegisteredUsers = {};
+
 function cognitoTokenResolver(req) {
     // console.log(`CognitoTokenResolver: Begin`);
     return new Promise((resolve, reject) => {
@@ -36,9 +38,15 @@ function cognitoTokenResolver(req) {
 async function makeSureUserIsRegistered(tokenPayload) {
     let userId = tokenPayload.sub;
     let email = tokenPayload.email;
+
+    // If we already know the user is registered, return.
+    if (knownRegisteredUsers[userId]) {
+        return;
+    }
     
     let user = await User.findOne({ userId: userId }).exec();
     if (user) {
+        knownRegisteredUsers[userId] = true;
         return;
     }
 
@@ -55,6 +63,7 @@ async function makeSureUserIsRegistered(tokenPayload) {
             picture:        ''
         };
         User.update({ email: email }, { $set: updateOperations }).exec()
+        knownRegisteredUsers[userId] = true;
     }
 }
 
