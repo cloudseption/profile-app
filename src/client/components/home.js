@@ -16,7 +16,7 @@ class Home extends Component {
             'Userid': 'c810f3c1-dd7d-4085-b85a-4839713d6c1b'
     
         }
-        axios.get("http://localhost:3000/api/users/c810f3c1-dd7d-4085-b85a-4839713d6c1b/landing-data")
+        axios.get(`http://localhost:3000/api/users/${window.localStorage.userId}/landing-data`)
         .then(response => {
             console.log(response.data);
             
