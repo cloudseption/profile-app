@@ -73,7 +73,7 @@ class Home extends Component {
     }
 
     render() { 
-        if (window.localStorage.userId == "") {
+        if (window.localStorage.userId == "" || window.localStorage.userId == undefined) {
             window.location = "/auth/login.html";
         }
         return (      
