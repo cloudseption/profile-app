@@ -13,32 +13,69 @@ class Home extends Component {
         axios.get(`http://localhost:3000/api/users/${window.localStorage.userId}/landing-data`)
         .then(response => {
             console.log(response.data);
-            
+
+            let app1 = {
+                appName: "Unresponsive",
+                imgUrl: "https://png.icons8.com/app",
+                appUrl: "",
+                text: ""
+            };
+
+            let app2 = {
+                appName: "Unresponsive",
+                imgUrl: "https://png.icons8.com/app",
+                appUrl: "",
+                text: ""
+            };
+
+            let app3 = {
+                appName: "Unresponsive",
+                imgUrl: "https://png.icons8.com/app",
+                appUrl: "",
+                text: ""
+            };
+
+            if (response.data[0]) {
+                app1 = {
+                    appName: response.data[0].name,
+                    imgUrl: response.data[0]['img-url'],
+                    appUrl: response.data[0].link,
+                    text: response.data[0].data[0]
+                };
+            }
+
+            if (response.data[1]) {
+                app2 = {
+                    appName: response.data[1].name,
+                    imgUrl: response.data[1]['img-url'],
+                    appUrl: response.data[1].link,
+                    text: response.data[1].data[0]
+                };
+            }
+
+            if (response.data[2]) {
+                app3 = {
+                    appName: response.data[2].name,
+                    imgUrl: response.data[2]['img-url'],
+                    appUrl: response.data[2].link,
+                    text: response.data[2].data[0]
+                };
+            }
+
             this.setState({
                 landingPageData: [
-                    {
-                        appName: response.data[2].name,
-                        imgUrl: "https://png.icons8.com/app",
-                        appUrl: "",
-                        text: response.data[2].data[0]
-                    },
-                    {
-                        appName: response.data[1].name,
-                        imgUrl: response.data[1]['img-url'],
-                        text: response.data[1].data[0]
-                    },
-                    {
-                        appName: response.data[0].name,
-                        imgUrl: response.data[0]['icon-url'],
-                        appUrl: response.data[0].link,
-                        text: response.data[0].text
-                    }
+                    app1,
+                    app2,
+                    app3
                 ]  
             });
         });
     }
 
     render() { 
+        if (window.localStorage.userId == "" || window.localStorage.userId == undefined) {
+            window.location = "/auth/login.html";
+        }
         return (      
             <div>
             <List>
