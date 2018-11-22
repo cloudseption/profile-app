@@ -1,20 +1,12 @@
 import React, { Component } from 'react';
 import List from '@material-ui/core/List';
 import AppCard from './appCard.js';
-import Button from '@material-ui/core/Button';
 import axios from 'axios';
 
 class Home extends Component {
-
+    
     state = {  
-        landingPageData : [
-            {
-                appName: "Test",
-                imgurl: "https://png.icons8.com/app",
-                appUrl: "",
-                data: ["app data"]
-            }
-        ]
+        landingPageData : []
     }
 
     componentDidMount = () => {
@@ -24,29 +16,43 @@ class Home extends Component {
             'Userid': 'c810f3c1-dd7d-4085-b85a-4839713d6c1b'
     
         }
-        axios.get("http://localhost:3000/api/users/c810f3c1-dd7d-4085-b85a-4839713d6c1b/landing-data",
-        {},
-        {headers: headers}
-        
-        )
+        axios.get("http://localhost:3000/api/users/c810f3c1-dd7d-4085-b85a-4839713d6c1b/landing-data")
         .then(response => {
-            console.log(this.state.landingPageData);
-            const landingPageData = response.data
+            console.log(response.data);
             
             this.setState({
-                landingPageData   
+                landingPageData: [
+                    {
+                        appName: "Tiny Tank Game",
+                        imgUrl: "https://png.icons8.com/app",
+                        appUrl: "",
+                        text: 'This apps top score'
+                    },
+                    {
+                        appName: "Quiz App",
+                        imgUrl: "https://png.icons8.com/app",
+                        appUrl: "",
+                        text: 'This apps top score'
+                    },
+                    {
+                        appName: response.data[0].name,
+                        imgUrl: response.data[0]['icon-url'],
+                        appUrl: response.data[0].link,
+                        text: response.data[0].text
+                    }
+                ]  
             });
-            console.log(this.state.landingPageData)
         });
     }
 
     render() { 
         return (      
             <div>
-            <Button variant="contained" color="primary">Profile</Button>
             <List>
             {this.state.landingPageData.map(appData => (
-                <AppCard appName={appData.appName} imgurl={appData.imgurl} data={appData.data}/>                
+                <AppCard key={appData.appName}
+                    appName={appData.appName} imgUrl={appData.imgUrl} 
+                    appUrl={appData.appUrl} text={appData.text}/>                
             ))}
             </List>
             </div>
