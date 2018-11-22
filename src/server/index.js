@@ -12,6 +12,7 @@ const dotenv = require("dotenv").config();
 const log = require('log4js').getLogger();
 log.level = process.env.LOG_LEVEL;
 
+const logEndpoint = require('./log');
 const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
 const appTokenResolver = require('./security/appTokenResolver');
@@ -64,17 +65,7 @@ app.use('/api', apiRouter);
 app.use('/users', userRoutes);
 
 // Little piece of middleware for sending log notifications from the browser.
-app.post('/log', (req, res, next) => {
-  let level   = req.body.level   ? req.body.level   : 'trace';
-  let message = req.body.message ? req.body.message : '';
-  let source  = req.ip;
-  try {
-    log[level](`Remote log from ${source}: ${message}`);
-  } catch (err) {
-    log.warn(`Remote log from ${source} specified invalid level ${level}. Original message was: ${message}`);
-  }
-  res.status(200).json(req.body);
-});
+app.post('/log', logEndpoint);
 
 // Please keep this middleware. It is important!
 app.use(/^(\/([^api]|[^auth]).*)/, function allowArbitraryPathingForReact(req, res, next) {
