@@ -9,12 +9,12 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 
 const styles = theme => ({
-    root: {
+    appCards: {
       width: '100%',
-      maxWidth: 900,
+      maxWidth: 800,
       backgroundColor: theme.palette.background.paper,
       margin: 'auto',
-      padding: '20px'
+      padding: '20px',
     },
 
     badge: {
@@ -29,7 +29,7 @@ class AppCard extends Component {
         const { classes } = this.props;
 
         return (      
-            <div className={classes.root}>
+            <div className={classes.appCards}>
                 <List>
                 <Card>
                     <CardContent>
