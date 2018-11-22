@@ -1,3 +1,4 @@
+const log           = require('log4js').getLogger();
 const mongoose      = require('mongoose');
 const PermissionSet = require('../api/models/permissionSet');
 
@@ -31,7 +32,7 @@ async function securityFilter(req, res, next) {
         }
     }
     catch (err) {
-        console.log(err);
+        log.trace(err);
     }
 
     let route       = req.path;
@@ -101,7 +102,7 @@ async function getClientIdFromToken(req) {
                 break;
             }
         } catch (err) {
-            console.log(err);
+            log.trace()
         }
     }
 

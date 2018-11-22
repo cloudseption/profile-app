@@ -1,4 +1,6 @@
+const log = require('log4js').getLogger();
 const CognitoExpress = require('cognito-express');
+const User = require('../api/models/user');
 
 let cognitoExpress = new CognitoExpress({
     region: 'us-west-2',
@@ -15,21 +17,45 @@ function cognitoTokenResolver(req) {
         // console.log(`CognitoTokenResolver: Try to validate token`, token);
         cognitoExpress.validate(token, function(err, response) {
             // console.log(`CognitoTokenResolver: Token validation complete`);
-            if (err) {
-                reject(`Invalid cognito token`);
-            }
+            if (!err) {
+                log.trace(`cognitoTokenResolver: response:`, response)
 
-            // console.log(`CognitoTokenResolver: Token valid; try to extract user data. Response: `, response);
-            try {
-                let user = response.sub;
-                // console.log(`CognitoTokenResolver: user ${user}`);
-                resolve(user);
-            } catch (err) {
-                // console.log(`CognitoTokenResolver: Error extracting userId ${err.message}`);
-                reject(err.message);
+                makeSureUserIsRegistered(response);
+                if (response && response.sub) {
+                    let user = response.sub;
+                    resolve(user);
+                    return;
+                }
             }
+            
+            reject(`Invalid cognito token`);
         });
     });
+}
+
+async function makeSureUserIsRegistered(tokenPayload) {
+    let userId = tokenPayload.sub;
+    let email = tokenPayload.email;
+    
+    let user = await User.findOne({ userId: userId }).exec();
+    if (user) {
+        return;
+    }
+
+    log.info(`cognitoTokenResolver: Detected token from unregistered user ${userId}, ${email}.`);
+    user = await User.findOne({ email: email }).exec();
+    if (!user) {
+        log.warn(`cognitoTokenResolver: Could not find user by userId OR email (${userId}, ${email})`);
+        return;
+    } else {
+        log.info(`cognitoTokenResolver: found unregistered user by email (${userId}, ${email}). Completing registration`);
+        const updateOperations  = {
+            userId:         userId,
+            description:    '',
+            picture:        ''
+        };
+        User.update({ email: email }, { $set: updateOperations }).exec()
+    }
 }
 
 module.exports = cognitoTokenResolver;

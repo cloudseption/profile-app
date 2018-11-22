@@ -9,6 +9,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv").config();
+const log = require('log4js').getLogger();
+log.level = process.env.LOG_LEVEL;
 
 const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
@@ -42,6 +44,7 @@ securityFilter.registerPublicRoute('*:/profile/*');
 securityFilter.registerPublicRoute('GET:/');
 securityFilter.registerPublicRoute('GET:/about');
 securityFilter.registerPublicRoute('GET:/search');
+securityFilter.registerPublicRoute('POST:/log');
 app.use(securityFilter);
 
 // Add CORS headers to request
@@ -59,6 +62,19 @@ app.use((req, res, next) => {
 app.use('/auth', auth);
 app.use('/api', apiRouter);
 app.use('/users', userRoutes);
+
+// Little piece of middleware for sending log notifications from the browser.
+app.post('/log', (req, res, next) => {
+  let level   = req.body.level   ? req.body.level   : 'trace';
+  let message = req.body.message ? req.body.message : '';
+  let source  = req.ip;
+  try {
+    log[level](`Remote log from ${source}: ${message}`);
+  } catch (err) {
+    log.warn(`Remote log from ${source} specified invalid level ${level}. Original message was: ${message}`);
+  }
+  res.status(200).json(req.body);
+});
 
 // Please keep this middleware. It is important!
 app.use(/^(\/([^api]|[^auth]).*)/, function allowArbitraryPathingForReact(req, res, next) {

@@ -68,12 +68,26 @@ Controller.prototype = {
                     document.cookie = cname + "=" + value;
                 })('cognitoToken', idToken, 365);
 
-                // Redirect
-                let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
-                let redirect = redirect64
-                             ? atob(redirect64)
-                             : `${window.location.origin}/`;
-                window.location = redirect;
+                // Ping the server. This is partially to let us log when users
+                // sign in, and partially to solve the issue I was having with
+                // completing registration.
+                fetch(`${window.location.origin}/log`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: `User ${userId} logged in` })
+                })
+                .then(result => {
+                    // Redirect
+                    let redirect64 = (new URLSearchParams(document.location.search)).get('redirect');
+                    let redirect = redirect64
+                                 ? atob(redirect64)
+                                 : `${window.location.origin}/`;
+                    window.location = redirect;
+                });
+
             },
             function signin_error(err) {
                 document.getElementById("signin_error_message").style.display = "block";
