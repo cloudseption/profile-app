@@ -9,7 +9,8 @@
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <div id="only_content_container">
             <div id="only_content">
-                <h1>WELCOME TO THE APP</h1>
+                <h1>Hang tight!</h1>
+                <h4>We're grabbing your access token</h4>
                 <button id="logout_button" class="btn btn-info">Logout</button>
             </div>
         </div>
@@ -27,7 +28,7 @@
             let logout_button_element = document.getElementById("logout_button");
             logout_button_element.onclick = function() {
                 userPool.getCurrentUser().signOut();
-                window.location.href= "index.html";
+                window.location.href= "login.html";
             }
         </script>
     </body>

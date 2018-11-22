@@ -14,10 +14,6 @@ const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
 const appTokenResolver = require('./security/appTokenResolver');
 
-const authProviderSingleton = require('./auth/api/v1_0_0/authProvider/AuthProvider').AuthProviderSingleton;
-authProviderSingleton.config = require('./auth/api/v1_0_0/config');
-authProviderSingleton.init();
-
 const port = process.env.PORT || 8080;
 
 const userRoutes = require('./api/routes/users');
