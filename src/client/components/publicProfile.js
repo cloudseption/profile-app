@@ -83,7 +83,7 @@ class PublicProfile extends Component {
   render() {
     return <React.Fragment>
       <div className="card m-2">
-        <div className="card-header container banner_frame">
+        <div className="card-header banner_frame">
           <div className="row">
             <div className="col-12">
               {!this.state.isEdit ? (
