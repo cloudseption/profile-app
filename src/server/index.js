@@ -9,7 +9,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const cookieParser = require('cookie-parser');
 const dotenv = require("dotenv").config();
+const log = require('log4js').getLogger();
+log.level = process.env.LOG_LEVEL;
 
+const logEndpoint = require('./log');
 const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
 const appTokenResolver = require('./security/appTokenResolver');
@@ -42,6 +45,7 @@ securityFilter.registerPublicRoute('*:/profile/*');
 securityFilter.registerPublicRoute('GET:/');
 securityFilter.registerPublicRoute('GET:/about');
 securityFilter.registerPublicRoute('GET:/search');
+securityFilter.registerPublicRoute('POST:/log');
 app.use(securityFilter);
 
 // Add CORS headers to request
@@ -59,6 +63,9 @@ app.use((req, res, next) => {
 app.use('/auth', auth);
 app.use('/api', apiRouter);
 app.use('/users', userRoutes);
+
+// Little piece of middleware for sending log notifications from the browser.
+app.post('/log', logEndpoint);
 
 // Please keep this middleware. It is important!
 app.use(/^(\/([^api]|[^auth]).*)/, function allowArbitraryPathingForReact(req, res, next) {
