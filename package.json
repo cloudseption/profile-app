@@ -16,6 +16,7 @@
   "author": "Sandeep Raveesh",
   "license": "ISC",
   "dependencies": {
+    "@material-ui/core": "^3.5.1",
     "@ckeditor/ckeditor5-build-inline": "^11.1.1",
     "@ckeditor/ckeditor5-react": "^1.0.0",
     "amazon-cognito-identity-js": "^3.0.3",
