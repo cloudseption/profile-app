@@ -13,7 +13,8 @@ class PublicProfile extends Component {
     badgeData: [],
     profile: {},
     userId: null,
-    currUser: false
+    currUser: false,
+    isEdit: false
   };
 
   componentDidMount() {
@@ -48,6 +49,17 @@ class PublicProfile extends Component {
       });
     }
   
+  handleButton() {
+    if(!this.state.isEdit) {
+      this.editPage();
+    } else {
+      this.saveUser();
+    }
+  }
+
+  editPage() {
+    this.setState({isEdit: true})
+  }
 
   saveUser() {
     let data = [
@@ -59,6 +71,7 @@ class PublicProfile extends Component {
       .patch(`http://localhost:8080/users/${this.state.userId}`,
         data
       );
+    this.setState( {isEdit: false});
   }
 
   render() {
@@ -67,7 +80,7 @@ class PublicProfile extends Component {
         <div className="card-header container banner_frame">
           <div className="row">
             <div className="col-12">
-              {!this.state.currUser ? (
+              {!this.state.isEdit ? (
                 <Name value={this.state.profile.name} />) : (
                   <CKEditor
                     editor={InlineEditor}
@@ -96,7 +109,7 @@ class PublicProfile extends Component {
           </div>
         </div>
         <div className="card-body">
-          {!this.state.currUser ? (
+          {!this.state.isEdit ? (
             <Biography text={this.state.profile.description} />) : (
               <CKEditor
                 editor={InlineEditor}
@@ -116,7 +129,7 @@ class PublicProfile extends Component {
       </div>
       {this.state.currUser &&
         <div className="col-sm-9">
-          <button onClick={this.saveUser.bind(this)}>Save</button>
+          <button onClick={this.handleButton.bind(this)}>{this.state.isEdit? "Save" : "Edit"}</button>
         </div>}
     </React.Fragment>;
   }
