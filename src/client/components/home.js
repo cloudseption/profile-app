@@ -15,24 +15,24 @@ class Home extends Component {
             console.log(response.data);
 
             let app1 = {
-                appName: "Unresponsive",
-                imgUrl: "https://png.icons8.com/app",
-                appUrl: "",
-                text: ""
+                appName: "Hangman",
+                imgUrl: "https://www.justinheidema.com/img/Hangman_Icon.png",
+                appUrl: "https://www.justinheidema.com",
+                text: "Not Added"
             };
 
             let app2 = {
-                appName: "Unresponsive",
-                imgUrl: "https://png.icons8.com/app",
-                appUrl: "",
-                text: ""
+                appName: "InQuizitive",
+                imgUrl: "http://inquizitive-images.s3-website-us-west-2.amazonaws.com/quiz-badge-24x24.png",
+                appUrl: "http://inquizitive.s3-website-us-west-2.amazonaws.com/index.html",
+                text: "Not Added"
             };
 
             let app3 = {
-                appName: "Unresponsive",
+                appName: "Tiny Tank Game",
                 imgUrl: "https://png.icons8.com/app",
-                appUrl: "",
-                text: ""
+                appUrl: "https://tiny-tanks.herokuapp.com/",
+                text: "Not Added"
             };
 
             if (response.data[0]) {
