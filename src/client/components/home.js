@@ -10,7 +10,7 @@ class Home extends Component {
     }
 
     componentDidMount = () => {
-        axios.get(`http://localhost:3000/api/users/${window.localStorage.userId}/landing-data`)
+        axios.get(`${window.location.origin}/api/users/${window.localStorage.userId}/landing-data`)
         .then(response => {
             console.log(response.data);
 

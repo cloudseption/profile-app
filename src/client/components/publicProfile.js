@@ -68,7 +68,7 @@ class PublicProfile extends Component {
       { propName: "picture", value: this.state.profile.picture }
     ];
     axios
-      .patch(`http://localhost:8080/users/${this.state.userId}`,
+      .patch(`${window.location.origin}/users/${this.state.userId}`,
         data
       );
     this.setState({ isEdit: false });
