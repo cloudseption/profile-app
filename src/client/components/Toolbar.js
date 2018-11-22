@@ -16,6 +16,9 @@ const toolbar = props => (
       <div className='toolbar-navigation-items'>
         <ul>
           <li>
+            <a href={'/profile/' + window.localStorage.getItem('userId')}>Profile</a>
+          </li>
+          <li>
             <a href="/search">Search</a>
           </li>
           <li>
