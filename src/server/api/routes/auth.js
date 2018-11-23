@@ -17,7 +17,12 @@ router.get('/token', async function getAccessToken(req, res, next) {
         let user        = await User.findOne({ userId: userId }).exec();
         let permissions = await PermissionSet.findOne({ clientId: appId, resourceId: userId }).exec();
         
-        const userClaims = { userId: userId, email: user.email, name: user.name };
+        const userClaims = {
+            userId: userId,
+            email: user.email,
+            name: user.name,
+            exp: Date.now() + (60 * 60 * 1000)
+        };
         const keyJson    = { kty: "oct", kid: app.clientKey, k:   app.clientSecret };
 
         if (permissions) {
