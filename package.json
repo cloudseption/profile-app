@@ -9,7 +9,7 @@
     "client": "webpack-dev-server --color --progress --mode development -d",
     "server": "nodemon -r esm --watch src/server --inspect src/server/index.js",
     "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
-    "heroku-postinstall": "bash ./launch-on-heroku.sh",
+    "heroku-postinstall": "chmod +x ./launch-on-heroku.sh && ./launch-on-heroku.sh",
     "test": "mocha ./test/**/*.test.js"
   },
   "author": "Sandeep Raveesh",
