@@ -9,7 +9,7 @@
     "client": "webpack-dev-server --color --progress --mode development -d",
     "server": "nodemon -r esm --watch src/server --inspect src/server/index.js",
     "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
-    "heroku-postinstall": "wget https://s3-us-west-2.amazonaws.com/cloudception-bucket/public/deployment_package.zip && unzip ./deployment_package.zip && rm ./deployment_package.zip",
+    "postinstall": "wget https://s3-us-west-2.amazonaws.com/cloudception-bucket/public/deployment_package.zip && unzip ./deployment_package.zip && rm ./deployment_package.zip",
     "test": "mocha ./test/**/*.test.js"
   },
   "author": "Sandeep Raveesh",
