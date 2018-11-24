@@ -1,55 +1,38 @@
 /**
- * Performs all handling for BadgeBook access tokens.
+ * Script for letting users log in via BadgeBook.
+ * 
+ * WHAT THIS SCRIPT DOES:
+ * 1) Loads any tokens returned from badgebook and stores them in cookies.
+ * 2) Provides an object that lets you interact with the BadgeBook Token Handler.
+ * 
+ * USE:
+ * 1) Run this script on your application's pages. Load it before you need to
+ *    make authenticated calls to your own server.
+ * 
+ * 2) Set the cookie name you want to use (default is `authorization`) and use
+ *    that same cookie to validate tokens on your server.
+ * 
+ * SETUP:
+ * - Set constants.
  */
 function createBadgeBookTokenHandler() {
+    // Set these
     const CLIENT_PUBLIC_KEY     = `PNgtW8zZiyhzxyRHtwtDjFMU4H_DA2_vSNJhillTjNU`;
-    const REDIRECT_URL          = `${window.location.origin}/auth/token.html?client_key=${CLIENT_PUBLIC_KEY}`;
-    const TOKEN_COOKIE_NAME     = `access_token`;
+    const BADGEBOOK_TOKEN_URL   = `${window.location.origin}/auth/token.html`;
+    const TOKEN_COOKIE_NAME     = `authorization`;
+    
+    // Leave these be
     const TOKEN_REGEX           = new RegExp(`${TOKEN_COOKIE_NAME}\\s*=\\s*[\\w\\d\\.\\+-]*`);
 
-    /**
-     * Pulls tokens passed back from badgebook via query strings and stores
-     * them in cookies.
-     */
-    function extractTokenFromQueryString() {
-        let url = new URL(window.location);
-        if (url.searchParams.has('token')) {
 
-            let token = url.searchParams.get('token');
-            saveCookie(TOKEN_COOKIE_NAME, token, 0.1, '/');
-            url.searchParams.delete('token');
-            window.location = url.toLocaleString();
-        }
-    };
-
+    /********************************************
+     *              EVENT HANDLERS              *
+     ********************************************/
+    // Put your custom functionality in these.
 
     /*
-     * Checks the current token stored in cookies.
+     * Called when a valid token is detected.
      */
-    function checkCurrentToken() {
-        try {
-            let token         = getTokenFromCookies();
-            let claims        = JSON.parse(atob(token.split('.')[1]));
-
-            if (token) {
-                if ((token ? claims.exp : 0) > Date.now()) {
-                    handleValidToken(claims);
-                } else {
-                    handleExpiredToken();
-                }
-            } else {
-                handleNoToken();
-            }
-        } catch (err) {
-            handleNoToken();
-        }
-    };
-
-    /*
-    * Called when a valid token is detected (note, we're not testing its
-    * signature here; simply making sure it exists and is not expired. You
-    * should still perform proper validation on the server).
-    */
     function handleValidToken(claims) {
         console.log(`User has a valid token`);
 
@@ -59,7 +42,7 @@ function createBadgeBookTokenHandler() {
 
 
     /*
-     * Called when invalid token is detected.
+     * Called when no token is detected.
      */
     function handleNoToken() {
         console.log('No token found');
@@ -79,42 +62,28 @@ function createBadgeBookTokenHandler() {
     }
 
 
+    /********************************************
+     *                PUBLIC API                *
+     ********************************************/
+
     /*
-    * Call to have the user log in with BadgeBook and return with an access token.
-    */
+     * Redirects the user to BadgeBook.
+     */
     function loginWithBadgeBook() {
         let currentUrl  = btoa(window.location);
-        window.location = REDIRECT_URL + `&redirect=${currentUrl}`;
-    }
-
-
-    /**
-     * Returns the user details from the currently stored token, or an empty
-     * object otherwise.
-     */
-    function getCurrentUserClaims() {
-        let token         = getTokenFromCookies();
-        let claims        = JSON.parse(atob(token.split('.')[1]));
-        return claims;
-    }
-
-    /**
-     * Clears the currently stored token from cookies.
-     */
-    function clearAccessToken() {
-        saveCookie(TOKEN_COOKIE_NAME, '', 0, '/');
+        window.location = `${BADGEBOOK_TOKEN_URL}?client_key=${CLIENT_PUBLIC_KEY}&redirect=${currentUrl}`;
     }
 
 
     /**
      * Returns the token from cookies.
      */
-    function getTokenFromCookies() {
+    function getCurrentToken() {
         let token;
         try {
             let cookies = document.cookie;
-            tokenStr    = TOKEN_REGEX.exec(cookies)[0];
-            token       = tokenStr ? tokenStr.split(`${TOKEN_COOKIE_NAME}=`)[1] : '';
+            tokenStr    = TOKEN_REGEX.exec(cookies);
+            token       = tokenStr ? tokenStr[0].split(`${TOKEN_COOKIE_NAME}=`)[1] : '';
         } catch (err) {
             console.log('error parsing token', err);
             token = ''; 
@@ -124,24 +93,89 @@ function createBadgeBookTokenHandler() {
 
 
     /**
-     * Saves a cookie.
+     * Returns the user details from the currently stored token, or an empty
+     * object otherwise.
      */
-    function saveCookie(name, value, exdays, path) {
-        const d = new Date();
-        d.setTime(d.getTime() + (exdays*24*60*60*1000));
-        const expires   = d.toUTCString();
-        document.cookie = `${name}=${value};expires=${expires};path=${path}`
+    function getCurrentUserClaims() {
+        let token         = getCurrentToken();
+        let claims        = JSON.parse(atob(token.split('.')[1]));
+        return claims;
     }
 
 
-    extractTokenFromQueryString();
-    checkCurrentToken();
+    /**
+     * Clears the currently stored token from cookies.
+     */
+    function clearAccessToken() {
+        saveCookie(TOKEN_COOKIE_NAME, '', 0, '/');
+    }
 
+
+    /********************************************
+     *       MAIN TOKEN RETRIEVAL SCRIPT        *
+     ********************************************/
+    (function onPageLoad() {
+        /**
+         * Pulls tokens passed back from badgebook via query strings and stores
+         * them in cookies.
+         */
+        function extractTokenFromQueryString() {
+            let url = new URL(window.location);
+            if (url.searchParams.has('token')) {
+
+                let token = url.searchParams.get('token');
+                saveCookie(TOKEN_COOKIE_NAME, token, 0.1, '/');
+                url.searchParams.delete('token');
+                window.location = url.toLocaleString();
+            }
+        };
+
+
+        /*
+        * Checks the current token stored in cookies.
+        */
+        function checkCurrentToken() {
+            try {
+                let token         = getCurrentToken();
+                let claims        = JSON.parse(atob(token.split('.')[1]));
+
+                if (token) {
+                    if ((token ? claims.exp : 0) > Date.now()) {
+                        handleValidToken(claims);
+                    } else {
+                        handleExpiredToken();
+                    }
+                } else {
+                    handleNoToken();
+                }
+            } catch (err) {
+                handleNoToken();
+            }
+        };
+
+
+        /**
+         * Saves a cookie.
+         */
+        function saveCookie(name, value, exdays, path) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            const expires   = d.toUTCString();
+            document.cookie = `${name}=${value};expires=${expires};path=${path}`
+        }
+
+        extractTokenFromQueryString();
+        checkCurrentToken();
+    })();
+
+    // Return public API
     return Object.freeze({
         loginWithBadgeBook:     loginWithBadgeBook,
+        getCurrentToken:        getCurrentToken,
         getCurrentUserClaims:   getCurrentUserClaims,
         clearAccessToken:       clearAccessToken
     });
 };
 
+// Provides a hook for user to access the script's API.
 const badgeBookTokenHandler = createBadgeBookTokenHandler();
