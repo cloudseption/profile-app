@@ -1,3 +1,4 @@
+const log = require('log4js').getLogger();
 const express = require('express');
 const router = express.Router();
 const jose = require('node-jose');
@@ -12,11 +13,19 @@ router.get('/token', async function getAccessToken(req, res, next) {
         let appId       = app.appId;
         let userId      = await req.clientId;
 
+        if (!userId) {
+            res.status(401).json({
+                notice: 'NEED_LOGIN'
+            });
+        }
+
         console.log(`getAccessToken: user ${userId}, app ${appId}`);
 
         let user        = await User.findOne({ userId: userId }).exec();
         let permissions = await PermissionSet.findOne({ clientId: appId, resourceId: userId }).exec();
         
+        log.debug(`permissions`, permissions);
+
         const userClaims = {
             userId: userId,
             email: user.email,

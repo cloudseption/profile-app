@@ -73,6 +73,10 @@ $(function () {
             let redirect = btoa(window.location);
             window.location.href = `permission.html?redirect=${redirect}&appId=${jsonResponse.appId}`;
         }
+        else if (jsonResponse.notice === 'NEED_LOGIN') {
+            let redirect = btoa(window.location);
+            window.location.href = `login.html?redirect=${redirect}`;
+        }
         else {
             console.log('Triggering redirect');
             let accessToken = jsonResponse.accesstoken;
