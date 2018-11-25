@@ -1,6 +1,6 @@
 .side-drawer {
     height:100%;
-    background: white;
+    background: rgb(32, 34, 37);
     position:fixed;
     top:0;
     left:0;
@@ -33,12 +33,12 @@
 
 .side-drawer a:hover,
 .side-drawer a:active {
-    color: #183b4b;
+    color: #79e279;
     text-decoration: none;
 }
 
 .side-drawer a {
-    color: #3582a5;
+    color: #35a53e;
     text-decoration: none;
     vertical-align: middle;
     display: table-cell;
@@ -47,7 +47,7 @@
 
 .side-drawer li:hover {
     color: white;
-    background-color:#a1cee4;
+    background-color:rgb(41, 44, 46);
     text-decoration: none;
 }
 
