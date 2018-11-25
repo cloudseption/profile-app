@@ -66,13 +66,14 @@ class PublicProfile extends Component {
   }
 
   saveUser() {
+    console.log('SAVING');
     let data = [
       { propName: "name", value: this.state.profile.name },
       { propName: "description", value: this.state.profile.description },
       { propName: "picture", value: this.state.profile.picture }
     ];
     axios
-      .patch(`${window.location.origin}/users/${this.state.userId}`,
+      .patch(`${window.location.origin}/api/users/${this.state.userId}`,
         data
       );
     this.setState({ isEdit: false });
