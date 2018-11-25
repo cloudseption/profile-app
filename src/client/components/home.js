@@ -12,7 +12,6 @@ class Home extends Component {
     componentDidMount = () => {
         axios.get(`${window.location.origin}/api/users/${window.localStorage.userId}/landing-data`)
         .then(response => {
-            
             this.setState({
                 landingPageData: response.data
             });
@@ -20,10 +19,6 @@ class Home extends Component {
     }
 
     render() { 
-        console.log("LANDING DATA", this.state.landingPageData);
-        if (this.state.landingPageData[0] != undefined){
-            console.log("DATA[0]", (this.state.landingPageData[0].data[0]));
-        }
         if (window.localStorage.userId == "" || window.localStorage.userId == undefined) {
             window.location = "/auth/login.html";
         }
