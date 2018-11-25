@@ -6,6 +6,7 @@ import BadgeFrame from "./badgeFrame";
 import Biography from "./biography";
 import Name from "./name";
 import ProfilePicture from "./profilePicture";
+import './publicProfile.css';
 
 class PublicProfile extends Component {
   // Hardcoded badgedata for now
@@ -82,49 +83,42 @@ class PublicProfile extends Component {
 
   render() {
     return <React.Fragment>
-      <div className="card m-2">
-        <div className="card-header banner_frame">
-          <div className="row">
-            <div className="col-12">
-              {!this.state.isEdit ? (
-                <Name value={this.state.profile.name} />) : (
-                  <h4><input type="text" value={this.state.profile.name} onChange={this.handleNameChange.bind(this)} /></h4>)}
+        <div className="card m-2 bg-dark">
+          <div className="card-header banner_frame bg-dark text-white">
+            <div className="row">
+              <div className="col-12">
+                {!this.state.isEdit ? <Name value={this.state.profile.name} /> : <h4>
+                    <input type="text" value={this.state.profile.name} onChange={this.handleNameChange.bind(this)} />
+                  </h4>}
+              </div>
             </div>
-
+            <div className="row">
+              <div className="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9">
+                <ProfilePicture picture={this.state.profile.picture} />
+              </div>
+              <div className="col-8 col-sm-7 col-md-5 col-lg-4 col-xl-3 description_frame">
+                <BadgeFrame badgeData={this.state.badgeData} />
+              </div>
+            </div>
           </div>
-          <div className="row">
-            <div className="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9">
-              <ProfilePicture picture={this.state.profile.picture} />
-            </div>
-            <div className="col-8 col-sm-7 col-md-5 col-lg-4 col-xl-3 description_frame">
-              <BadgeFrame badgeData={this.state.badgeData} />
-            </div>
-          </div>
-        </div>
-        <div className="card-body">
-          {!this.state.isEdit ? (
-            <Biography text={this.state.profile.description} />) : (
-              <CKEditor
-                editor={InlineEditor}
-                data={this.state.profile.description}
-                onInit={editor => {
+          <div className="card-body bg-secondary">
+            {!this.state.isEdit ? <Biography text={this.state.profile.description} /> : <CKEditor editor={InlineEditor} data={this.state.profile.description} onInit={editor => {
                   // You can store the "editor" and use when it is needed.
-                  console.log('Editor is ready to use!', editor);
-                }}
-                onChange={(event, editor) => {
+                  console.log("Editor is ready to use!", editor);
+                }} onChange={(event, editor) => {
                   const data = editor.getData();
                   let prof = this.state.profile;
                   prof.description = data;
-                  this.setState({ profile: prof })
-                }}
-              />)}
+                  this.setState({ profile: prof });
+                }} />}
+          </div>
         </div>
-      </div>
-      {this.state.currUser &&
-        <div className="col-sm-9">
-          <button onClick={this.handleButton.bind(this)}>{this.state.isEdit ? "Save" : "Edit"}</button>
-        </div>}
-    </React.Fragment>;
+        {this.state.currUser && <div className="col-sm-9">
+            <button onClick={this.handleButton.bind(this)}>
+              {this.state.isEdit ? "Save" : "Edit"}
+            </button>
+          </div>}
+      </React.Fragment>;
   }
 }
 

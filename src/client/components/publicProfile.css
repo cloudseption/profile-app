@@ -1,0 +1,10 @@
+.card-header.bg-dark {
+    background-color: rgb(32, 34, 37) !important;
+}
+
+.card-body.bg-secondary {
+    background-color: rgb(46,48,53) !important;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    color:white;
+}
