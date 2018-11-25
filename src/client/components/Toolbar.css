@@ -1,7 +1,7 @@
 .toolbar {
     width:100%;
     position:fixed;
-    background: #50c0f4;
+    background: #1c5767;
     top: 0;
     left: 0;
     height:56px;
@@ -47,7 +47,7 @@
 
 .toolbar-navigation-items a:hover,
 .toolbar-navigation-items a:active {
-    color: #3582a5;
+    color: #1c5767;
     text-decoration: none;
 }
 
