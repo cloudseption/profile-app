@@ -109,7 +109,14 @@ Controller.prototype = {
                 },
                 body: JSON.stringify({ permissions: permissions })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    let redirect = btoa(window.location);
+                    let url = `${window.location.origin}/auth/login.html?redirect=${redirect}`;
+                }
+            })
             .then(responseJson => {
                 if (responseJson.error) {
                     throw new Error(responseJson.error);
@@ -121,15 +128,16 @@ Controller.prototype = {
     redirect: function(response) {
         let search_params   = new URLSearchParams(document.location.search);
         let redirect        = atob(search_params.get('redirect'));
-        let grant_param     = `permission=${response.permission}`;
+        // let grant_param     = `permission=${response.permission}`;
 
-        if (redirect.indexOf('?') < 0) {
-            redirect += '?' + grant_param;
-        } else {
-            redirect += '&' + grant_param;
-        }
+        // if (redirect.indexOf('?') < 0) {
+        //     redirect += '?' + grant_param;
+        // } else {
+        //     redirect += '&' + grant_param;
+        // }
 
-        window.location = redirect;
+        console.log(redirect);
+        // window.location = redirect;
     },
 
     handle_error: function(err) {

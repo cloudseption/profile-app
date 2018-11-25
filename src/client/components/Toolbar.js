@@ -2,10 +2,6 @@ import React from 'react';
 import DrawerToggleButton from './DrawerToggleButton';
 import './Toolbar.css';
 
-// if (window.localStorage.userId == "" || window.localStorage.userId == undefined) {
-//   window.location = "/auth/login.html";
-// }
-
 const toolbar = props => (
   <header className="toolbar">
     <nav className="toolbar-navigation">

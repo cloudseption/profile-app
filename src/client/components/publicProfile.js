@@ -7,6 +7,9 @@ import Biography from "./biography";
 import Name from "./name";
 import ProfilePicture from "./profilePicture";
 import './publicProfile.css';
+import iconEdit from '../icons/svg/pencil.svg';
+import iconSave from "../icons/svg/check.svg";
+
 
 class PublicProfile extends Component {
   // Hardcoded badgedata for now
@@ -81,23 +84,45 @@ class PublicProfile extends Component {
     this.setState({ profile: prof });
   }
 
+  
+
   render() {
     return <React.Fragment>
         <div className="card m-2 bg-dark">
           <div className="card-header banner_frame bg-dark text-white">
-            <div className="row">
+            <div className="row" align="center">
+              <div className="col-12">
+                {this.state.currUser && <div align="right" className="col-sm-12">
+                    <button className="profile-edit-button" onClick={this.handleButton.bind(this)}>
+                      {this.state.isEdit ? (
+                        <img
+                          style={{ width: "20px" }}
+                          src={iconSave}
+                          alt="Save"
+                        />
+                      ) : (
+                        <img
+                          style={{ width: "20px" }}
+                          src={iconEdit}
+                          alt="Edit"
+                        />
+                      )}
+                    </button>
+                  </div>}
+              </div>
+            </div>
+            <div className="row" align="center">
+              <div className="col-12">
+                <div className="col-4 col-sm-5 col-md-7 col-lg-7 col-xl-7">
+                  <ProfilePicture picture={this.state.profile.picture} />
+                </div>
+              </div>
+            </div>
+            <div className="row" align="center" style={{ marginTop: "0.5rem" }}>
               <div className="col-12">
                 {!this.state.isEdit ? <Name value={this.state.profile.name} /> : <h4>
                     <input type="text" value={this.state.profile.name} onChange={this.handleNameChange.bind(this)} />
                   </h4>}
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9">
-                <ProfilePicture picture={this.state.profile.picture} />
-              </div>
-              <div className="col-8 col-sm-7 col-md-5 col-lg-4 col-xl-3 description_frame">
-                <BadgeFrame badgeData={this.state.badgeData} />
               </div>
             </div>
           </div>
@@ -112,12 +137,14 @@ class PublicProfile extends Component {
                   this.setState({ profile: prof });
                 }} />}
           </div>
+          <div class="card-footer">
+            <div className="row">
+              <div className="col-8 col-sm-7 col-md-5 col-lg-5 col-xl-5 description_frame">
+                <BadgeFrame badgeData={this.state.badgeData} />
+              </div>
+            </div>
+          </div>
         </div>
-        {this.state.currUser && <div className="col-sm-9">
-            <button onClick={this.handleButton.bind(this)}>
-              {this.state.isEdit ? "Save" : "Edit"}
-            </button>
-          </div>}
       </React.Fragment>;
   }
 }
