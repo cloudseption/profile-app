@@ -115,7 +115,7 @@ class PublicProfile extends Component {
             <div className="row" align="center">
               <div className="col-12">
                 <div className="col-4 col-sm-5 col-md-7 col-lg-7 col-xl-7">
-                  <ProfilePicture picture={this.state.profile.picture} />
+                  <ProfilePicture picture={this.state.profile.picture} profileUser={this.props.match.params.handle} />
                 </div>
               </div>
             </div>

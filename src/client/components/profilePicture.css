@@ -1,3 +1,24 @@
+.image-wrapper-div {
+    position: relative;
+}
+
 .profile_picture {
     max-height: 15em;
 }
+
+.edit-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: url(https://s3-us-west-2.amazonaws.com/cloudception-bucket/public/edit-icon.png);
+    background-size: 1.2em 1.5em;
+    background-repeat: no-repeat;
+    border: none;
+    padding: 0;
+    margin: 0;
+    height: 2em;
+    width: 1.7em;
+}
+
+/* .image-upload-form-wrapper {
+} */

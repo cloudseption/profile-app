@@ -6,9 +6,17 @@ const User = require('../models/user');
 const App = require('../models/app');
 const PermissionSet = require('../models/permissionSet');
 const log = require('log4js').getLogger();
+const fileUpload = require('express-fileupload');
+const AWS = require('aws-sdk');
+const config = new AWS.Config();
+const path = require('path');
+config.update({region: process.env.AWS_REGION})
+const s3 = new AWS.S3();;
 
 const BADGE_PERMISSION = 'DISPLAY:badge';
 const LANDING_PAGE_PERMISSION = 'DISPLAY:landing-page';
+
+router.use(fileUpload());
 
 router.get('/', (req, res, next) => {
     User.find()
@@ -365,6 +373,52 @@ router.delete("/:userId/by-obj-id", (req, res, next) => {
     .catch(err => {
         console.log(err);
         res.status(500).json({ error: err });
+    });
+});
+
+router.post('/:userId/image', (req, res, next) => {
+    if (Object.keys(req.files).length == 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    let image = req.files.profileImage;
+    let imgType = /\.[\w\d]+$/.exec(image.name)[0];
+    let imgName = `${req.params.userId}${imgType}`;
+    let tmpPath = path.resolve(`${__dirname}/../../../../temp`);
+
+    let params = {
+        Body:           image.data,
+        Bucket:         `${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}`,
+        Key:            imgName,
+        ContentType:    image.mimetype
+    };
+
+    log.error(image);
+
+    // res.status(500).json(err);
+    // return;
+
+    s3.putObject(params, (err, data) => {
+        if (err) {
+            log.error(err);
+            res.status(500).json(err);
+            return;
+        }
+        else {
+            log.info(data);
+
+            User.update({ userId: req.params.userId },
+                {$set: {
+                    picture: `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}`
+                }}).exec()
+            .then((result) => {
+                res.status(200).send('File uploaded!');
+            })
+            .catch((err) => {
+                log.error(err);
+                res.status(500).json(err);
+            })
+        }
     });
 });
 
