@@ -15,4 +15,9 @@ ul {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+    border-radius:5px;
+}
+
+.card.m-2 {
+    background-color: rgba(0,0,0,0);
 }

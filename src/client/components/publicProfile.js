@@ -7,6 +7,9 @@ import Biography from "./biography";
 import Name from "./name";
 import ProfilePicture from "./profilePicture";
 import './publicProfile.css';
+import iconEdit from '../icons/svg/pencil.svg';
+import iconSave from "../icons/svg/check.svg";
+
 
 class PublicProfile extends Component {
   // Hardcoded badgedata for now
@@ -63,13 +66,14 @@ class PublicProfile extends Component {
   }
 
   saveUser() {
+    console.log('SAVING');
     let data = [
       { propName: "name", value: this.state.profile.name },
       { propName: "description", value: this.state.profile.description },
       { propName: "picture", value: this.state.profile.picture }
     ];
     axios
-      .patch(`${window.location.origin}/users/${this.state.userId}`,
+      .patch(`${window.location.origin}/api/users/${this.state.userId}`,
         data
       );
     this.setState({ isEdit: false });
@@ -81,51 +85,68 @@ class PublicProfile extends Component {
     this.setState({ profile: prof });
   }
 
+  
+
   render() {
     return <React.Fragment>
-      <div className="card m-2">
-        <div className="card-header banner_frame">
-          <div className="row">
-            <div className="col-12">
-              {!this.state.isEdit ? (
-                <Name value={this.state.profile.name} />) : (
-                  <h4><input type="text" value={this.state.profile.name} onChange={this.handleNameChange.bind(this)} /></h4>)}
+        <div className="card m-2 bg-dark">
+          <div className="card-header banner_frame bg-dark text-white">
+            <div className="row" align="center">
+              <div className="col-12">
+                {this.state.currUser && <div align="right" className="col-sm-12">
+                    <button className="profile-edit-button" onClick={this.handleButton.bind(this)}>
+                      {this.state.isEdit ? (
+                        <img
+                          style={{ width: "20px" }}
+                          src={iconSave}
+                          alt="Save"
+                        />
+                      ) : (
+                        <img
+                          style={{ width: "20px" }}
+                          src={iconEdit}
+                          alt="Edit"
+                        />
+                      )}
+                    </button>
+                  </div>}
+              </div>
             </div>
-
+            <div className="row" align="center">
+              <div className="col-12">
+                <div className="col-4 col-sm-5 col-md-7 col-lg-7 col-xl-7">
+                  <ProfilePicture picture={this.state.profile.picture} />
+                </div>
+              </div>
+            </div>
+            <div className="row" align="center" style={{ marginTop: "0.5rem" }}>
+              <div className="col-12">
+                {!this.state.isEdit ? <Name value={this.state.profile.name} /> : <h4>
+                    <input type="text" value={this.state.profile.name} onChange={this.handleNameChange.bind(this)} />
+                  </h4>}
+              </div>
+            </div>
           </div>
-          <div className="row">
-            <div className="col-4 col-sm-5 col-md-7 col-lg-7 col-xl-7">
-              <ProfilePicture picture={this.state.profile.picture} />
-            </div>
-            <div className="col-8 col-sm-7 col-md-5 col-lg-5 col-xl-5 description_frame">
-              <BadgeFrame badgeData={this.state.badgeData} />
-            </div>
-          </div>
-        </div>
-        <div className="card-body">
-          {!this.state.isEdit ? (
-            <Biography text={this.state.profile.description} />) : (
-              <CKEditor
-                editor={InlineEditor}
-                data={this.state.profile.description}
-                onInit={editor => {
+          <div className="card-body bg-secondary">
+            {!this.state.isEdit ? <Biography text={this.state.profile.description} /> : <CKEditor editor={InlineEditor} data={this.state.profile.description} onInit={editor => {
                   // You can store the "editor" and use when it is needed.
-                  console.log('Editor is ready to use!', editor);
-                }}
-                onChange={(event, editor) => {
+                  console.log("Editor is ready to use!", editor);
+                }} onChange={(event, editor) => {
                   const data = editor.getData();
                   let prof = this.state.profile;
                   prof.description = data;
-                  this.setState({ profile: prof })
-                }}
-              />)}
+                  this.setState({ profile: prof });
+                }} />}
+          </div>
+          <div className="card-footer">
+            <div className="row">
+              <div className="col-8 col-sm-7 col-md-5 col-lg-5 col-xl-5 description_frame">
+                <BadgeFrame badgeData={this.state.badgeData} />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      {this.state.currUser &&
-        <div className="col-sm-9">
-          <button onClick={this.handleButton.bind(this)}>{this.state.isEdit ? "Save" : "Edit"}</button>
-        </div>}
-    </React.Fragment>;
+      </React.Fragment>;
   }
 }
 

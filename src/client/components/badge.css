@@ -16,7 +16,7 @@ div.badge_frame.badge_frame {
 }
 
 .badge_link:link, .badge_link:visited, .badge_link:hover, .badge_link:link {
-    color: black;
+    color: white;
 }
 
 .badge_image {
@@ -27,4 +27,3 @@ div.badge_frame.badge_frame {
 .badge_text {
     white-space: pre;
 }
-

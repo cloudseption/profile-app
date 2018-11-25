@@ -7,12 +7,13 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import './appCard.css'
 
 const styles = theme => ({
     appCards: {
       width: '100%',
       maxWidth: 800,
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: 'rgb(54, 57, 62)',
       margin: 'auto',
       padding: '20px',
     },
@@ -36,7 +37,7 @@ class AppCard extends Component {
                         <List>
                             <ListItem>
                             <Avatar src={this.props.imgUrl}/>
-                            <ListItemText primary={this.props.appName}/>
+                            <ListItemText className="card-text" primary={this.props.appName}/>
                             <ListItemText primary={this.props.text}/>
                             <Button onClick={this.openApp} variant="contained" color="primary" > 
                                 To App 

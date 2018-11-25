@@ -21,12 +21,12 @@ const sideDrawer = props => {
           <li>
             <a href="/home">Landing Page</a>
           </li>
-          <li>
-            <a href="/auth/login.html">Login</a>
-          </li>
-          <li>
-            <a onClick={props.signOut} href="#">Logout</a>
-          </li>
+          {
+            ( window.localStorage.userId == "" ||
+              window.localStorage.userId == undefined ) ?
+            <li><a href="/auth/login.html">Login</a></li> :
+            <li><a onClick={props.signOut} href="#">Logout</a></li>
+          }
         </ul>
       </nav>);
 };
