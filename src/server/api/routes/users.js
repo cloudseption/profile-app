@@ -6,7 +6,6 @@ const User = require('../models/user');
 const App = require('../models/app');
 const PermissionSet = require('../models/permissionSet');
 const log = require('log4js').getLogger();
-const fileUpload = require('express-fileupload');
 const AWS = require('aws-sdk');
 const config = new AWS.Config();
 const path = require('path');
@@ -15,8 +14,6 @@ const s3 = new AWS.S3();;
 
 const BADGE_PERMISSION = 'DISPLAY:badge';
 const LANDING_PAGE_PERMISSION = 'DISPLAY:landing-page';
-
-router.use(fileUpload());
 
 router.get('/', (req, res, next) => {
     User.find()
@@ -393,11 +390,15 @@ router.delete("/:userId/by-obj-id", (req, res, next) => {
 });
 
 router.post('/:userId/image', (req, res, next) => {
+    
     if (Object.keys(req.files).length == 0) {
         return res.status(400).send('No files were uploaded.');
     }
 
     let image = req.files.profileImage;
+
+    console.log(image);
+
     let imgType = /\.[\w\d]+$/.exec(image.name)[0];
     let imgName = `${req.params.userId}${imgType}`;
     let tmpPath = path.resolve(`${__dirname}/../../../../temp`);
@@ -415,23 +416,22 @@ router.post('/:userId/image', (req, res, next) => {
     // return;
 
     s3.putObject(params, (err, data) => {
+        console.log(data);
         if (err) {
-            log.error(err);
+            log.error('ERROR HERE', err);
             res.status(500).json(err);
             return;
         }
         else {
-            log.info(data);
+            const pictureUrl = `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}?cacheStop=${Date.now()}`;
 
             User.update({ userId: req.params.userId },
-                {$set: {
-                    picture: `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}?cacheStop=${Date.now()}`
-                }}).exec()
-            .then((result) => {
-                res.status(200).redirect(`/profile/${req.params.userId}`);
+                {$set: { picture: pictureUrl }}).exec()
+            .then(() => {
+                res.status(200).json({ picture: pictureUrl });
             })
             .catch((err) => {
-                log.error(err);
+                log.error('ERROR HERE 2', err);
                 res.status(500).json(err);
             })
         }

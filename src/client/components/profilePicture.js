@@ -9,7 +9,13 @@ class ProfilePicture extends Component {
     displayUploadForm: false,
     imageToUpload: []
   };
-  
+
+  componentWillReceiveProps() {
+    if (this.props.picture !== this.state.picture) {
+      this.setState({ picture: this.props.picture ? this.props.picture : DEFAULT_PICTURE_URL });
+    }
+  }
+
   render() {
     const imageUploadEndpoint = `${document.location.origin}/api/users/${this.props.profileUser}/image`;
     // console.log("PictureProps", this.props, this.state)
@@ -18,18 +24,15 @@ class ProfilePicture extends Component {
       <div className="image-wrapper-div">
         <img className="profile_picture img-fluid"
             onClick={this.handleImageClick.bind(this)}
-            src={this.props.picture ? this.props.picture : DEFAULT_PICTURE_URL}
+            src={this.state.picture || DEFAULT_PICTURE_URL}
             alt="">
         </img>
-
-        { this.isCurrentUsersProfile() && (
-          <div className='edit-icon' onClick={this.handleImageClick.bind(this)}></div>
-        )}
 
         { this.state.displayUploadForm && (
             <form ref='uploadForm' 
               id='uploadForm' 
               action={imageUploadEndpoint}
+              onSubmit={this.handleSubmit.bind(this)}
               method='post' 
               encType="multipart/form-data">
                 <div className='image-upload-form-wrapper align-middle'>
@@ -53,18 +56,7 @@ class ProfilePicture extends Component {
   }
 
   handleSelectImage(event) {
-    const fileReader    = new FileReader();
-    const fileToUpload  = event.target.files[0];
-
-    console.log('handleSelectImage');
-    console.log(fileToUpload);
-
-    fileReader.onload = ( upload ) => {
-      let imageToUpload = [ upload.target.result ];
-      this.setState({ imageToUpload: imageToUpload });
-    };
-
-    fileReader.readAsDataURL(fileToUpload);
+    this.setState({ imageToUpload: event.target.files[0] });
   }
 
   handleImageClick() {
@@ -79,18 +71,16 @@ class ProfilePicture extends Component {
 
   handleSubmit = ( event ) => {
     event.preventDefault(); //So the page does not refresh
-    const imageUploadEndpoint = `${document.location.origin}/api/users/${this.props.profileUser}/image`;
-    const { imageToUpload }   = this.state;
+    
+    const url     = `${document.location.origin}/api/users/${this.props.profileUser}/image`;
+    const config  = { headers: { 'Content-Type': 'multipart/form-data' } };
+    const data    = new FormData();
+    data.append('profileImage', this.state.imageToUpload );
 
-    axios({
-      url: imageUploadEndpoint,
-      method: "POST",
-      data: {
-        file: imageToUpload, //This is a data url version of the file
-      }
-    })
+    axios.post(url, data, config)
     .then(result => {
       console.log(result);
+      this.setState({ picture: result.data.picture });
     })
     .catch(err => {
       console.log(err);

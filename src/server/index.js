@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 const dotenv = require("dotenv").config();
 const log = require('log4js').getLogger();
 log.level = process.env.LOG_LEVEL;
@@ -29,7 +30,13 @@ mongoose.connect(
 
 // Middleware
 app.use(cookieParser());
-app.use(bodyParser());
+app.use(bodyParser({
+  json: {limit: '50mb', extended: true},
+  urlencoded: {limit: '50mb', extended: true}
+}));
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 }
+}));
 app.use(morgan('dev')); // Used for logging requests
 
 // Set up security Filter
@@ -97,6 +104,7 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  log.error(error);
   res.status(error.status || 500);
   res.json({
     error: { message: error.message }
