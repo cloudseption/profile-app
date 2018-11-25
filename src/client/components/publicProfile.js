@@ -137,7 +137,7 @@ class PublicProfile extends Component {
                   this.setState({ profile: prof });
                 }} />}
           </div>
-          <div class="card-footer">
+          <div className="card-footer">
             <div className="row">
               <div className="col-8 col-sm-7 col-md-5 col-lg-5 col-xl-5 description_frame">
                 <BadgeFrame badgeData={this.state.badgeData} />
