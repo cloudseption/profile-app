@@ -33,7 +33,7 @@ const toolbar = props => (
             ( window.localStorage.userId == "" ||
               window.localStorage.userId == undefined ) ?
             <li><a href="/auth/login.html">Login</a></li> :
-            <li><a onClick={props.signOut} href="#">Logout</a></li>
+            <li><a className="logout" onClick={props.signOut} href="#">Log out</a></li>
           }
         </ul>
       </div>
