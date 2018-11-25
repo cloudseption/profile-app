@@ -6,3 +6,8 @@ body {
   text-align: center;
   margin: auto;
 }
+
+.main {
+  top: 64px;
+  position: relative;
+}

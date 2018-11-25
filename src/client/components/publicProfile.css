@@ -1,0 +1,19 @@
+/* Mobile */
+@media (max-width: 768px) {
+    .card.m-2 {
+        margin: 0px 0.5rem 0.5rem 0.5rem !important;
+    }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+    .card.m-2 {
+        max-width: 700px;
+        margin-top: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
+
+
+

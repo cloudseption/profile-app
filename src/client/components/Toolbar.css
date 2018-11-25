@@ -4,7 +4,8 @@
     background: #50c0f4;
     top: 0;
     left: 0;
-    height:56px;
+    height: 56px;
+    z-index: 10;
 }
 
 .toolbar-logo {

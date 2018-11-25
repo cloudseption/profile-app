@@ -6,6 +6,7 @@ import BadgeFrame from "./badgeFrame";
 import Biography from "./biography";
 import Name from "./name";
 import ProfilePicture from "./profilePicture";
+import './publicProfile.css';
 
 class PublicProfile extends Component {
   // Hardcoded badgedata for now
@@ -93,10 +94,10 @@ class PublicProfile extends Component {
 
           </div>
           <div className="row">
-            <div className="col-4 col-sm-5 col-md-7 col-lg-8 col-xl-9">
+            <div className="col-4 col-sm-5 col-md-7 col-lg-7 col-xl-7">
               <ProfilePicture picture={this.state.profile.picture} />
             </div>
-            <div className="col-8 col-sm-7 col-md-5 col-lg-4 col-xl-3 description_frame">
+            <div className="col-8 col-sm-7 col-md-5 col-lg-5 col-xl-5 description_frame">
               <BadgeFrame badgeData={this.state.badgeData} />
             </div>
           </div>
