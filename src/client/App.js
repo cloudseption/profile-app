@@ -51,7 +51,7 @@ export default class App extends Component {
         <Toolbar signOut={this.signOut} drawerClickHandler={this.drawerToggleClickHandler} />
         <SideDrawer signOut={this.signOut} show={this.state.sideDrawerOpen} />
         {backdrop}
-        <main style={{ marginTop: '64px' }}>
+        <main className="main">
           <Router>
             <Switch>
               <Route path="/profile/:handle" component={PublicProfile} />
