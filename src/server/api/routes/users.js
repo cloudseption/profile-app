@@ -428,7 +428,7 @@ router.post('/:userId/image', (req, res, next) => {
                     picture: `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}?cacheStop=${Date.now()}`
                 }}).exec()
             .then((result) => {
-                res.status(200).send('File uploaded!');
+                res.status(200).redirect(`/profile/${req.params.userId}`);
             })
             .catch((err) => {
                 log.error(err);

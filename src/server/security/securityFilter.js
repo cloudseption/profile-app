@@ -161,8 +161,6 @@ function lookupPermissions(clientId, resourceId) {
 function isRouteAuthorized(route, method, permissions) {
     let allowedRoutes = [].concat(publicRoutes);
 
-    console.log('permissions:', permissions);
-
     permissions.forEach(permission => {
         if (! (/^ROUTE:/.test(permission))) { return; }
         permissionStr = permission.slice(6);
