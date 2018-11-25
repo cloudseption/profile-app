@@ -20,20 +20,21 @@ class Home extends Component {
     }
 
     render() { 
-        // How we're preventing non-logged in users from accessing landing pages. LOL
-        // TODO: Prevent in routing?
+        console.log("LANDING DATA", this.state.landingPageData);
+        if (this.state.landingPageData[0] != undefined){
+            console.log("DATA[0]", (this.state.landingPageData[0].data[0]));
+        }
         if (window.localStorage.userId == "" || window.localStorage.userId == undefined) {
             window.location = "/auth/login.html";
         }
-
         return <div>
             <List>
               {this.state.landingPageData.map(appData => (
                 <AppCard
                   key={appData.name}
                   appName={appData.name}
-                  imgUrl={appData.imgUrl}
-                  appUrl={appData.appUrl}
+                  imgUrl={appData['img-url']}
+                  appUrl={appData.link}
                   text={appData.data[0] ? appData.data[0] : "Not Added"}
                 />
               ))}
