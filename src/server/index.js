@@ -16,6 +16,7 @@ const logEndpoint = require('./log');
 const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
 const appTokenResolver = require('./security/appTokenResolver');
+const userResourceResolver = require('./security/userResourceResolver');
 
 const port = process.env.PORT || 8080;
 
@@ -34,13 +35,19 @@ app.use(morgan('dev')); // Used for logging requests
 // Set up security Filter
 securityFilter.registerTokenResolver(cognitoTokenResolver);
 securityFilter.registerTokenResolver(appTokenResolver);
+securityFilter.registerResourceResolver(userResourceResolver);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
+securityFilter.registerPublicRoute('*:/api/permissions/*/*');
 securityFilter.registerPublicRoute('*:/api/resources/*');
 securityFilter.registerPublicRoute('*:/api/apps/*');
+
 securityFilter.registerPublicRoute('*:/api/users/*');
+securityFilter.registerPublicRoute('*:/api/users/*/badge-data');
+securityFilter.registerPublicRoute('*:/api/users/pre-register');
+securityFilter.registerPublicRoute('*:/api/users/verify');
+
 securityFilter.registerPublicRoute('*:/auth/*');
 securityFilter.registerPublicRoute('*:/user/*');
-securityFilter.registerPublicRoute('*:/users/*');
 securityFilter.registerPublicRoute('*:/profile/*');
 securityFilter.registerPublicRoute('GET:/');
 securityFilter.registerPublicRoute('GET:/about');

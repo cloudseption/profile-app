@@ -128,6 +128,21 @@ router.post('/verify', (req, res, next) => {
 
     User.update({ email: email }, { $set: updateOperations })
     .exec()
+    .then(() => {
+        // Give the user their starting permissions
+        let permissionSet = new PermissionSet({
+            _id: new mongoose.Types.ObjectId(),
+            clientId:    userId, 
+            resourceId:  userId,
+            permissions: [
+                `ROUTE:*:/api/users/${userId}/*`,
+                `ROUTE:*:/api/permissions/${userId}/*`,
+                `ROUTE:*:/api/permissions/*/${userId}`
+            ]
+        });
+    
+        return permissionSet.save();
+    })
     .then(result => {
         res.status(200).json(result);
     })
@@ -196,6 +211,7 @@ router.get('/:userId', (req, res, next) => {
  * Queries all attached apps and returns their badgeData for the given user.
  */
 router.get('/:userId/badge-data', (req, res, next) => {
+    log.warn(`Getting badge data`);
     let userId = req.params.userId;
 
     App.find()
@@ -409,7 +425,7 @@ router.post('/:userId/image', (req, res, next) => {
 
             User.update({ userId: req.params.userId },
                 {$set: {
-                    picture: `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}`
+                    picture: `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}?cacheStop=${Date.now()}`
                 }}).exec()
             .then((result) => {
                 res.status(200).send('File uploaded!');
