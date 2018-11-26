@@ -1,3 +1,4 @@
+const log = require('log4js').getLogger();
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -25,6 +26,8 @@ router.post('/:clientId/:resourceId', (req, res, next) => {
     if (!Array.isArray(permissions)) {
         permissions = [ permissions ];
     }
+    
+    log.debug(`PERMISSIONS`, permissions);
 
     PermissionSet.find({clientId: clientId, resourceId: resourceId })
     .then(docs => {

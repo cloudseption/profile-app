@@ -6,6 +6,19 @@ const User = require('../models/user');
 const App = require('../models/app');
 const PermissionSet = require('../models/permissionSet');
 const log = require('log4js').getLogger();
+const AWS = require('aws-sdk');
+const config = new AWS.Config();
+const path = require('path');
+
+config.update({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId:        process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey:    process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
+
+const s3 = new AWS.S3();;
 
 const BADGE_PERMISSION = 'DISPLAY:badge';
 const LANDING_PAGE_PERMISSION = 'DISPLAY:landing-page';
@@ -120,6 +133,34 @@ router.post('/verify', (req, res, next) => {
 
     User.update({ email: email }, { $set: updateOperations })
     .exec()
+    .then(() => {
+        // Give the user their starting permissions
+        let permissionSet = new PermissionSet({
+            _id: new mongoose.Types.ObjectId(),
+            clientId:    userId, 
+            resourceId:  userId,
+            permissions: [
+                `ROUTE:*:/api/users/${userId}/*`,
+                `ROUTE:*:/api/permissions/${userId}/*`,
+                `ROUTE:*:/api/permissions/*/${userId}`
+            ]
+        });
+    
+        return permissionSet.save();
+    })
+    .then(() => {
+        // Give the user their starting permissions
+        let permissionSet = new PermissionSet({
+            _id: new mongoose.Types.ObjectId(),
+            clientId:    userId, 
+            resourceId:  'na',
+            permissions: [
+                `ROUTE:*:/api/auth/token`,
+            ]
+        });
+    
+        return permissionSet.save();
+    })
     .then(result => {
         res.status(200).json(result);
     })
@@ -188,6 +229,7 @@ router.get('/:userId', (req, res, next) => {
  * Queries all attached apps and returns their badgeData for the given user.
  */
 router.get('/:userId/badge-data', (req, res, next) => {
+    log.warn(`Getting badge data`);
     let userId = req.params.userId;
 
     App.find()
@@ -365,6 +407,39 @@ router.delete("/:userId/by-obj-id", (req, res, next) => {
     .catch(err => {
         console.log(err);
         res.status(500).json({ error: err });
+    });
+});
+
+router.post('/:userId/image', (req, res, next) => {
+    if (Object.keys(req.files).length == 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    let image   = req.files.profileImage;
+    let imgType = /\.[\w\d]+$/.exec(image.name)[0];
+    let imgName = `${req.params.userId}${imgType}`;
+
+    let params = {
+        Body:           image.data,
+        Bucket:         `${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}`,
+        Key:            imgName,
+        ContentType:    image.mimetype
+    };
+
+    s3.putObject(params, (err) => {
+        if (err) {
+            log.error('Error uploading file to S3', err);
+            res.status(500).json(err);
+        } else {
+            const pictureUrl = `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}?cacheStop=${Date.now()}`;
+
+            User.update({ userId: req.params.userId }, { $set: { picture: pictureUrl } }).exec()
+            .then(() => res.status(200).json({ picture: pictureUrl }))
+            .catch((err) => {
+                log.error(`Error writing to BadgeBook database`, err);
+                res.status(500).json(err);
+            });
+        }
     });
 });
 

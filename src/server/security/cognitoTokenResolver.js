@@ -20,7 +20,7 @@ function cognitoTokenResolver(req) {
         cognitoExpress.validate(token, function(err, response) {
             // console.log(`CognitoTokenResolver: Token validation complete`);
             if (!err) {
-                log.trace(`cognitoTokenResolver: response:`, response)
+                // log.trace(`cognitoTokenResolver: response:`, response)
 
                 makeSureUserIsRegistered(response);
                 if (response && response.sub) {

@@ -1,3 +1,4 @@
+const dotenv = require("dotenv").config();
 const express = require('express');
 const app = express();
 const os = require('os');
@@ -8,7 +9,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const cookieParser = require('cookie-parser');
-const dotenv = require("dotenv").config();
+const fileUpload = require('express-fileupload');
 const log = require('log4js').getLogger();
 log.level = process.env.LOG_LEVEL;
 
@@ -16,6 +17,7 @@ const logEndpoint = require('./log');
 const securityFilter = require('./security/securityFilter');
 const cognitoTokenResolver = require('./security/cognitoTokenResolver');
 const appTokenResolver = require('./security/appTokenResolver');
+const userResourceResolver = require('./security/userResourceResolver');
 
 const port = process.env.PORT || 8080;
 
@@ -28,21 +30,46 @@ mongoose.connect(
 
 // Middleware
 app.use(cookieParser());
-app.use(bodyParser());
+app.use(bodyParser({
+  json: {limit: '50mb', extended: true},
+  urlencoded: {limit: '50mb', extended: true}
+}));
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 }
+}));
 app.use(morgan('dev')); // Used for logging requests
+
+app.use(function(req, res, next) {
+  log.trace(`Begin ${req.method} : ${req.path}`);
+  next();
+})
 
 // Set up security Filter
 securityFilter.registerTokenResolver(cognitoTokenResolver);
 securityFilter.registerTokenResolver(appTokenResolver);
+securityFilter.registerResourceResolver(userResourceResolver);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
+securityFilter.registerPublicRoute('*:/api/permissions/*/*');
 securityFilter.registerPublicRoute('*:/api/resources/*');
 securityFilter.registerPublicRoute('*:/api/apps/*');
+
 securityFilter.registerPublicRoute('*:/api/users/*');
-securityFilter.registerPublicRoute('*:/auth/*');
-securityFilter.registerPublicRoute('*:/user/*');
-securityFilter.registerPublicRoute('*:/users/*');
-securityFilter.registerPublicRoute('*:/profile/*');
+securityFilter.registerPublicRoute('*:/api/users/*/badge-data');
+securityFilter.registerPublicRoute('*:/api/users/pre-register');
+securityFilter.registerPublicRoute('*:/api/users/verify');
+
+securityFilter.registerPublicRoute('*:/api/auth/token');
+
+// Webpage Requests
 securityFilter.registerPublicRoute('GET:/');
+securityFilter.registerPublicRoute('GET:/profile/*');
+securityFilter.registerPublicRoute('GET:/profile/*/*');
+securityFilter.registerPublicRoute('GET:/auth/*');
+securityFilter.registerPublicRoute('GET:/auth/*/*');
+securityFilter.registerPublicRoute('GET:/auth/*/*/*');
+securityFilter.registerPublicRoute('GET:/auth/*/*/*/*');
+securityFilter.registerPublicRoute('GET:/user/*');
+securityFilter.registerPublicRoute('GET:/profile/*');
 securityFilter.registerPublicRoute('GET:/about');
 securityFilter.registerPublicRoute('GET:/search');
 securityFilter.registerPublicRoute('POST:/log');
@@ -90,6 +117,7 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  log.error(error);
   res.status(error.status || 500);
   res.json({
     error: { message: error.message }

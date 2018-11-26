@@ -38,13 +38,16 @@ async function securityFilter(req, res, next) {
     let route       = req.path;
     let method      = req.method.toUpperCase();
     let permissions = req.permissions;
+    let authorized  = isRouteAuthorized(route, method, permissions);
 
-    // console.log({
-    //     clientId: req.clientId,
-    //     resourceId: req.resourceId
-    // });
+    log.trace({ securityFilterDetails: {
+        clientId: req.clientId,
+        resourceId: req.resourceId,
+        route: route,
+        authorized: authorized
+    }});
 
-    if (isRouteAuthorized(route, method, permissions)) {
+    if (authorized) {
         next();
     } else {
         console.log('Blocking unauthorized request', {
@@ -167,19 +170,15 @@ function isRouteAuthorized(route, method, permissions) {
     let incomingRoute   = `${method}:${route}`.toLowerCase();
     let matchingRule    = allowedRoutes.find(routeRule => routeRule.test(incomingRoute));
     let matches         = Boolean(matchingRule);
-
-    // console.log('MATCHING', incomingRoute);
-    // console.log('ALLOWED ROUTES', allowedRoutes);
-    // console.log(matches);
     return matches;
 }
 
 function makeRouteRegExp(str) {
     let regExpStr = str.toLowerCase();
-    regExpStr = regExpStr.split('*').join('.*');
-    regExpStr = regExpStr.split('/.').join('[/.]');
-    regExpStr = regExpStr.split('/').join('\/');
-    return new RegExp(`^${regExpStr}`);
+    regExpStr = regExpStr.split('*').join('[\\w\\d\\-\\+\\.\\?]*');
+    // regExpStr = regExpStr.split('/.').join('[/.]');
+    regExpStr = regExpStr.split('/').join('\\/');
+    return new RegExp(`^${regExpStr}$`);
 }
 
 module.exports = securityFilter;
