@@ -1,3 +1,4 @@
+const dotenv = require("dotenv").config();
 const express = require('express');
 const app = express();
 const os = require('os');
@@ -9,7 +10,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser'); // TODO: Remove, depreciated.
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
-const dotenv = require("dotenv").config();
 const log = require('log4js').getLogger();
 log.level = process.env.LOG_LEVEL;
 
@@ -58,13 +58,18 @@ securityFilter.registerPublicRoute('*:/api/users/*/badge-data');
 securityFilter.registerPublicRoute('*:/api/users/pre-register');
 securityFilter.registerPublicRoute('*:/api/users/verify');
 
-securityFilter.registerPublicRoute('*:/auth/*');
-securityFilter.registerPublicRoute('*:/auth/*/*');
-securityFilter.registerPublicRoute('*:/auth/*/*/*');
-securityFilter.registerPublicRoute('*:/auth/*/*/*/*');
-securityFilter.registerPublicRoute('*:/user/*');
-securityFilter.registerPublicRoute('*:/profile/*');
+securityFilter.registerPublicRoute('*:/api/auth/token');
+
+// Webpage Requests
 securityFilter.registerPublicRoute('GET:/');
+securityFilter.registerPublicRoute('GET:/profile/*');
+securityFilter.registerPublicRoute('GET:/profile/*/*');
+securityFilter.registerPublicRoute('GET:/auth/*');
+securityFilter.registerPublicRoute('GET:/auth/*/*');
+securityFilter.registerPublicRoute('GET:/auth/*/*/*');
+securityFilter.registerPublicRoute('GET:/auth/*/*/*/*');
+securityFilter.registerPublicRoute('GET:/user/*');
+securityFilter.registerPublicRoute('GET:/profile/*');
 securityFilter.registerPublicRoute('GET:/about');
 securityFilter.registerPublicRoute('GET:/search');
 securityFilter.registerPublicRoute('POST:/log');

@@ -9,7 +9,15 @@ const log = require('log4js').getLogger();
 const AWS = require('aws-sdk');
 const config = new AWS.Config();
 const path = require('path');
-config.update({region: process.env.AWS_REGION})
+
+config.update({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId:        process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey:    process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
+
 const s3 = new AWS.S3();;
 
 const BADGE_PERMISSION = 'DISPLAY:badge';
@@ -403,18 +411,13 @@ router.delete("/:userId/by-obj-id", (req, res, next) => {
 });
 
 router.post('/:userId/image', (req, res, next) => {
-    
     if (Object.keys(req.files).length == 0) {
         return res.status(400).send('No files were uploaded.');
     }
 
-    let image = req.files.profileImage;
-
-    console.log(image);
-
+    let image   = req.files.profileImage;
     let imgType = /\.[\w\d]+$/.exec(image.name)[0];
     let imgName = `${req.params.userId}${imgType}`;
-    let tmpPath = path.resolve(`${__dirname}/../../../../temp`);
 
     let params = {
         Body:           image.data,
@@ -422,11 +425,6 @@ router.post('/:userId/image', (req, res, next) => {
         Key:            imgName,
         ContentType:    image.mimetype
     };
-
-    log.error(image);
-
-    // res.status(500).json(err);
-    // return;
 
     s3.putObject(params, (err, data) => {
         console.log(data);
