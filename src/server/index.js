@@ -39,6 +39,11 @@ app.use(fileUpload({
 }));
 app.use(morgan('dev')); // Used for logging requests
 
+app.use(function(req, res, next) {
+  log.trace(`Begin ${req.method} : ${req.path}`);
+  next();
+})
+
 // Set up security Filter
 securityFilter.registerTokenResolver(cognitoTokenResolver);
 securityFilter.registerTokenResolver(appTokenResolver);
@@ -54,6 +59,9 @@ securityFilter.registerPublicRoute('*:/api/users/pre-register');
 securityFilter.registerPublicRoute('*:/api/users/verify');
 
 securityFilter.registerPublicRoute('*:/auth/*');
+securityFilter.registerPublicRoute('*:/auth/*/*');
+securityFilter.registerPublicRoute('*:/auth/*/*/*');
+securityFilter.registerPublicRoute('*:/auth/*/*/*/*');
 securityFilter.registerPublicRoute('*:/user/*');
 securityFilter.registerPublicRoute('*:/profile/*');
 securityFilter.registerPublicRoute('GET:/');

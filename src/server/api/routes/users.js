@@ -140,6 +140,19 @@ router.post('/verify', (req, res, next) => {
     
         return permissionSet.save();
     })
+    .then(() => {
+        // Give the user their starting permissions
+        let permissionSet = new PermissionSet({
+            _id: new mongoose.Types.ObjectId(),
+            clientId:    userId, 
+            resourceId:  'na',
+            permissions: [
+                `ROUTE:*:/api/auth/token`,
+            ]
+        });
+    
+        return permissionSet.save();
+    })
     .then(result => {
         res.status(200).json(result);
     })
