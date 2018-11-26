@@ -21,7 +21,7 @@ class ProfilePicture extends Component {
 
   render() {
     const imageUploadEndpoint = `${document.location.origin}/api/users/${this.props.profileUser}/image`;
-    // console.log("PictureProps", this.props, this.state)
+    console.log("PictureProps", this.props)
 
     const imgStyle = {
       opacity: 0
@@ -36,9 +36,8 @@ class ProfilePicture extends Component {
 
     return (
       <div className={`image-wrapper-div`} style={wrapperStyle}>
-        <div className={`picture-screen ${ this.state.fadePicture && 'fade-picture' }`}></div>
+        <div className={`picture-screen ${ this.props.isEdit && 'fade-picture' }`}></div>
         <img className={`profile-picture img-fluid`}
-            onClick={this.toggleUploadForm.bind(this)}
             style={imgStyle}
             src={DEFAULT_PICTURE_URL}
             alt="">
@@ -56,7 +55,7 @@ class ProfilePicture extends Component {
           </table>
         )}
 
-        { this.state.displayUploadForm && (
+        { this.props.isEdit && (
             <form ref='uploadForm' 
               id='uploadForm' 
               action={imageUploadEndpoint}
@@ -80,15 +79,6 @@ class ProfilePicture extends Component {
     );
   }
 
-  toggleUploadForm() {
-    if (this.isCurrentUsersProfile()) {
-      this.setState({
-        displayUploadForm: ! this.state.displayUploadForm,
-        fadePicture: ! this.state.displayUploadForm
-      });
-    }
-  }
-
   handleUploadImage(event) {
     this.setState({
       displayUploadForm: false,
@@ -107,6 +97,7 @@ class ProfilePicture extends Component {
 
     axios.post(url, data, config)
     .then(result => {
+      this.props.onPictureChange(result.data.picture);
       this.setState({
         picture: result.data.picture,
         loading: false,
