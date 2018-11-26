@@ -70,6 +70,7 @@ securityFilter.registerPublicRoute('GET:/auth/*/*/*');
 securityFilter.registerPublicRoute('GET:/auth/*/*/*/*');
 securityFilter.registerPublicRoute('GET:/user/*');
 securityFilter.registerPublicRoute('GET:/profile/*');
+securityFilter.registerPublicRoute('GET:/*');
 securityFilter.registerPublicRoute('GET:/about');
 securityFilter.registerPublicRoute('GET:/search');
 securityFilter.registerPublicRoute('POST:/log');
