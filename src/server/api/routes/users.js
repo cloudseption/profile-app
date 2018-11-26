@@ -410,13 +410,46 @@ router.delete("/:userId/by-obj-id", (req, res, next) => {
     });
 });
 
+/**
+ * Gets the type of an image regardless of 
+ * whether a file extension is in the name or not.
+ */
+function getImageType(arrayBuffer) {
+    var type = "";
+    var dv = new DataView(arrayBuffer, 0, 5);
+    var nume1 = dv.getUint8(0, true);
+    var nume2 = dv.getUint8(1, true);
+    var hex = nume1.toString(16) + nume2.toString(16);
+
+    switch (hex) {
+        case "8950":
+            type = "image/png";
+            break;
+        case "4749":
+            type = "image/gif";
+            break;
+        case "424d":
+            type = "image/bmp";
+            break;
+        case "ffd8":
+            type = "image/jpeg";
+            break;
+        default:
+            type = null;
+            break;
+    }
+    return type;
+}
+
+//
 router.post('/:userId/image', (req, res, next) => {
     if (Object.keys(req.files).length == 0) {
         return res.status(400).send('No files were uploaded.');
     }
 
     let image   = req.files.profileImage;
-    let imgType = /\.[\w\d]+$/.exec(image.name)[0];
+    let imgBuffer = new ArrayBuffer(image.data.length);
+    let imgType = getImageType(imgBuffer);
     let imgName = `${req.params.userId}${imgType}`;
 
     let params = {
