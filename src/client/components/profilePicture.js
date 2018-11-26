@@ -26,9 +26,6 @@ class ProfilePicture extends Component {
     const imgStyle = {
       opacity: 0
     };
-    // if ((!this.state.loading) && this.state.picture) {
-    //   imgStyle.opacity = '0';
-    // }
 
     const wrapperStyle = {
       backgroundImage: `url(${this.state.picture})`,
@@ -40,7 +37,7 @@ class ProfilePicture extends Component {
         <img className={`profile-picture img-fluid`}
             style={imgStyle}
             src={DEFAULT_PICTURE_URL}
-            alt="">
+            alt="Profile Image">
         </img>
 
         { this.state.loading && (

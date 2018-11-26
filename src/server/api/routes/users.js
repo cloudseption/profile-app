@@ -426,25 +426,19 @@ router.post('/:userId/image', (req, res, next) => {
         ContentType:    image.mimetype
     };
 
-    s3.putObject(params, (err, data) => {
-        console.log(data);
+    s3.putObject(params, (err) => {
         if (err) {
-            log.error('ERROR HERE', err);
+            log.error('Error uploading file to S3', err);
             res.status(500).json(err);
-            return;
-        }
-        else {
+        } else {
             const pictureUrl = `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.S3_BUCKET_NAME}/${process.env.S3_IMAGE_PATH}/${imgName}?cacheStop=${Date.now()}`;
 
-            User.update({ userId: req.params.userId },
-                {$set: { picture: pictureUrl }}).exec()
-            .then(() => {
-                res.status(200).json({ picture: pictureUrl });
-            })
+            User.update({ userId: req.params.userId }, { $set: { picture: pictureUrl } }).exec()
+            .then(() => res.status(200).json({ picture: pictureUrl }))
             .catch((err) => {
-                log.error('ERROR HERE 2', err);
+                log.error(`Error writing to BadgeBook database`, err);
                 res.status(500).json(err);
-            })
+            });
         }
     });
 });
