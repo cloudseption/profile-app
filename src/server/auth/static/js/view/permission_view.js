@@ -50,9 +50,10 @@ View.prototype = {
         this.client_app_homepage.innerHTML = data.url;
         this.client_app_homepage.href = data.url;
 
-        data.requiredResources.forEach(scope => {
+        data.prettyResources.forEach(scope => {
             let element = document.createElement("li");
             let text = document.createTextNode(scope);
+            element.setAttribute('class', 'white-text');
             element.appendChild(text);
             this.permission_list.appendChild(element);
         });
