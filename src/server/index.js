@@ -51,6 +51,7 @@ securityFilter.registerResourceResolver(userResourceResolver);
 securityFilter.registerPublicRoute('*:/api/permissions/*');
 securityFilter.registerPublicRoute('*:/api/permissions/*/*');
 securityFilter.registerPublicRoute('*:/api/resources/*');
+securityFilter.registerPublicRoute('*:/api/apps');
 securityFilter.registerPublicRoute('*:/api/apps/*/keypair');
 securityFilter.registerPublicRoute('*:/api/users');
 securityFilter.registerPublicRoute('*:/api/users/*');
