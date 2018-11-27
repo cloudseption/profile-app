@@ -272,6 +272,48 @@ router.get('/:userId/badge-data', (req, res, next) => {
 });
 
 /**
+ * Queries all attached apps and returns userId's for users that matches the search params.
+ * Returns [] if none exist.
+ */
+router.get('/:skill/:score/score-data', (req, res, next) => {
+    log.warn(`Getting userIds based on score data`);
+    const skill = req.params.skill;
+    const score = req.params.score;
+
+    App.find()
+        .exec()
+        .then(appsData => {
+            let returnedUserIds = [];
+            appsData.forEach(async (appData) => {
+                let appId = appData.appId;
+                let skillSearchEndpoint = appData.skillSearchEndpoint;
+                let appToken = appData.appToken;
+
+                if (skillSearchEndpoint) {
+                    returnedUserIds.push(
+                        getProfileIds(appId, skillSearchEndpoint, appToken, skill, score)
+                    );
+                }
+            });
+
+            return Promise.all(returnedUserIds);
+        })
+        .then(responses => {
+            console.log('Joining responses');
+            let results = [];
+            responses.forEach(response => {
+                if (response) {
+                    results = results.concat(response);
+                }
+            });
+            res.status(200).json(results);
+        }) // Here we'll have a list of user ids. now return the users the same way Prab's search returns them.
+        .catch(err => {
+            console.log(err);
+        })
+});
+
+/**
  * Queries all attached apps and returns their landingData for the given user.
  */
 router.get('/:userId/landing-data', (req, res, next) => {
@@ -315,10 +357,27 @@ router.get('/:userId/landing-data', (req, res, next) => {
 });
 
 /**
+ * Requests profile data from the given remote app's endpoint.
+ */
+function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
+    return Axios.post(searchEndpoint, {
+        skill: skill,
+        score: score
+    },
+    {
+        headers: {
+            'Authorization': appToken,
+        }
+    })
+    .then(res => res.data.skillSearchData)
+    .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
+}
+
+/**
  * Requests badge page data from the given remote app's endpoint.
  */
-function getBadgeData(appId, badgeEndpoint, appToken, userId) {
-    return Axios.post(badgeEndpoint, {},
+function getBadgeData(appId, skillSearchEndpoint, appToken, userId) {
+    return Axios.post(skillSearchEndpoint, {},
         {
             headers: {
             'Authorization' : appToken,

@@ -18,23 +18,22 @@ class SearchContainer extends Component {
     }
 
     handleAdvancedSearch = searchParams => {
-      // parse the params
+
       console.log(searchParams);
-      
-      // call endpoint to search for all those skills with those scores in the high score table of each app.
-      // axios
-      //   .get(
-      //     ``
-      //   )
-      //   .then(res => {
-      //     try {
-      //       const profiles = res.data;
-      //       console.log("profiles", profiles);
-      //       this.setState({ profiles });
-      //     } catch (e) {
-      //       console.log(e);
-      //     }
-      //   });
+      const skill = searchParams.skill;
+      const score = searchParams.score;
+
+      // Get profiles of all users in external apps matching search.
+      const advSearchUrl = `${document.location.protocol}//${document.location.host}/api/users/${skill}/${score}/score-data`;
+      axios.get(advSearchUrl).then(res => {
+        try{
+          if (res && res.data) {
+            this.setState({ profiles: res.data });
+          }
+        } catch(e) {
+          console.log(e);
+        }
+      });
     }
 
     handleGetProfile = searchParams => {
