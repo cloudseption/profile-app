@@ -28,6 +28,7 @@ class SearchContainer extends Component {
       axios.get(advSearchUrl).then(res => {
         try{
           if (res && res.data) {
+            // Need to determine where the list is based on the response. Response not yet known.
             this.setState({ profiles: res.data });
           }
         } catch(e) {

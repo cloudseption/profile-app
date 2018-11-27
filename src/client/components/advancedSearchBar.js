@@ -26,28 +26,27 @@ class AdvancedSearchBar extends Component {
   }
   
   render() {
-    return (
-      <form className="form-inline m-2" onSubmit={this.handleSubmit}>
+    return <form className="form-inline m-2" onSubmit={this.handleSubmit}>
         <select id="skill" onChange={this.handleSkillChange} value={this.state.skill}>
-            <option value="Java">Java</option>
-            <option value="C++">C++</option>
+            <option value="java">Java</option>
+            <option value="javascipt">Javascript</option>
+            <option value="hangman">Hangman</option>
+            <option value="tankgame">Tank Game</option>
         </select>
 
         <select id="score" onChange={this.handleScoreChange} value={this.state.score}>
             <option value="5">Top 5%</option>
             <option value="10">Top 10%</option>
-            <option value="25">Top 25%</option>
+            <option value="20">Top 20%</option>
+            <option value="30">Top 30%</option>
+            <option value="40">Top 40%</option>
+            <option value="50">Top 50%</option>
         </select>
 
-        <button
-          className="btn btn-outline-success my-2 my-sm-0"
-          type="button"
-          onClick={this.handleSubmit}
-        >
+        <button className="btn btn-outline-success my-2 my-sm-0" type="button" onClick={this.handleSubmit}>
           Search
         </button>
-      </form>
-    );
+      </form>;
   }
 }
 
