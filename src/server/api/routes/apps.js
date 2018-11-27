@@ -1,8 +1,10 @@
+const log = require('log4js').getLogger();
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const jose = require('node-jose');
 
+const Resource = require('../models/resource');
 const App = require('../models/app');
 
 router.get('/', (req, res, next) => {
@@ -29,32 +31,51 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.get('/:appId', (req, res, next) => {
-    console.log(req.params.appId);
-    App.findOne({ appId: req.params.appId })
-    .exec()
-    .then(doc => {
-        if (!doc) {
+router.get('/:appId', async (req, res, next) => {
+    try {
+        let app = await App.findOne({ appId: req.params.appId }).exec();
+        if (!app) {
             throw new Error(`${req.params.appId} not found`);
         }
-        let sanitizedDoc = {
-            appId:             doc.appId,
-            displayName:       doc.displayName,
-            url:               doc.url,
-            badgeEndpoint:     doc.badgeEndpoint,
-            landingEndpoint:   doc.landingEndpoint,
-            appToken:          doc.appToken,
-            requiredResources: doc.requiredResources,
-        }
-        res.status(200).json(sanitizedDoc);
-    })
-    .catch(err => {
-        console.log(err);
+        let resources       = await Resource.find().exec();
+        let prettyResources = [];
+
+        app.requiredResources.forEach(requestedResource => {
+            console.log('requesting [' + requestedResource + ']');
+            let prettyRes = resources.find(resource => {
+                console.log('found.... ' + resource.name);
+                let requstedRes = makeRouteRegExp(requestedResource.toLowerCase());
+                console.log(requstedRes);
+                return requstedRes.test(resource.name.toLowerCase())
+            });
+
+            
+            if (prettyRes) {
+                console.log('using.... ' + prettyRes.name);
+                prettyResources.push(prettyRes.displayName);
+            }
+        })
+    
+        let output = {
+            appId:             app.appId,
+            displayName:       app.displayName,
+            url:               app.url,
+            badgeEndpoint:     app.badgeEndpoint,
+            landingEndpoint:   app.landingEndpoint,
+            appToken:          app.appToken,
+            requiredResources: app.requiredResources,
+            prettyResources:   prettyResources
+        };
+    
+        res.status(200).json(output);
+    } 
+    catch (err) {
+        log.error(err);
         if (err.message) {
             err = err.message;
         }
         res.status(500).json({ error: err  });
-    });
+    }
 });
 
 router.post('/', (req, res, next) => {
@@ -174,6 +195,14 @@ router.delete("/:appId", (req, res, next) => {
 function generateKeyPair() {
     return jose.JWK.createKey("oct", 256, { alg: 'HS256' })
     .then(key => key.toJSON(true));
+}
+
+function makeRouteRegExp(str) {
+    let regExpStr = str.toLowerCase();
+    regExpStr = regExpStr.split('*').join('[\\w\\d\\-\\+\\.\\?]*');
+    // regExpStr = regExpStr.split('/.').join('[/.]');
+    regExpStr = regExpStr.split('/').join('\\/');
+    return new RegExp(`^${regExpStr}$`);
 }
 
 module.exports = router;
