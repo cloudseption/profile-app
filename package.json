@@ -30,6 +30,7 @@
     "directory-named-webpack-plugin": "^4.0.0",
     "dotenv": "^6.1.0",
     "esm": "^3.0.84",
+    "event-stream": "^3.3.4",
     "express": "^4.16.3",
     "express-fileupload": "^1.0.0",
     "jquery": "^3.3.1",
