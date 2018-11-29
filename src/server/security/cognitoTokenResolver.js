@@ -1,6 +1,8 @@
 const log = require('log4js').getLogger();
 const CognitoExpress = require('cognito-express');
 const User = require('../api/models/user');
+const PermissionSet = require('../api/models/permissionSet');
+const mongoose = require('mongoose');
 
 let cognitoExpress = new CognitoExpress({
     region: 'us-west-2',
@@ -63,6 +65,51 @@ async function makeSureUserIsRegistered(tokenPayload) {
             picture:        ''
         };
         User.update({ email: email }, { $set: updateOperations }).exec()
+        .then(() => {
+            // Give the user their starting permissions
+            let permissionSet = new PermissionSet({
+                _id: new mongoose.Types.ObjectId(),
+                clientId:    userId, 
+                resourceId:  userId,
+                permissions: [
+                    `ROUTE:*:/api/users/${userId}/*`,
+                    `ROUTE:*:/api/permissions/${userId}/*`,
+                    `ROUTE:*:/api/permissions/*/${userId}`
+                ]
+            });
+    
+            log.trace(`Writing default permissions for user ${userId} to access their own resources`);
+        
+            return permissionSet.save().then(result => {
+                log.trace(result);
+            });
+        })
+        .then(() => {
+            // Give the user their starting permissions
+            let permissionSet = new PermissionSet({
+                _id: new mongoose.Types.ObjectId(),
+                clientId:    userId, 
+                resourceId:  'na',
+                permissions: [
+                    `ROUTE:*:/api/auth/token`,
+                    `ROUTE:*:/api/users/${userId}/*`,
+                    `ROUTE:*:/api/permissions/${userId}/*`,
+                    `ROUTE:*:/api/permissions/*/${userId}`
+                ]
+            });
+        
+            log.trace(`Writing default permissions for user ${userId} to access null resourceIds`);
+            return permissionSet.save().then(result => {
+                log.trace(result);
+            });;
+        })
+        .then(result => {
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            log.error(err);
+        });
+
         knownRegisteredUsers[userId] = true;
     }
 }
