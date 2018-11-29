@@ -56,10 +56,10 @@ securityFilter.registerPublicRoute('GET:/api/apps/*');
 securityFilter.registerPublicRoute('*:/api/apps/*/keypair');
 securityFilter.registerPublicRoute('*:/api/users');
 securityFilter.registerPublicRoute('*:/api/users/*');
+securityFilter.registerPublicRoute('*:/api/users/*/by-obj-id');
 securityFilter.registerPublicRoute('*:/api/users/*/badge-data');
 securityFilter.registerPublicRoute('*:/api/users/pre-register');
 securityFilter.registerPublicRoute('*:/api/users/verify');
-
 securityFilter.registerPublicRoute('*:/api/auth/token');
 
 // Webpage Requests
@@ -76,6 +76,7 @@ securityFilter.registerPublicRoute('GET:/*');
 securityFilter.registerPublicRoute('GET:/about');
 securityFilter.registerPublicRoute('GET:/search');
 securityFilter.registerPublicRoute('POST:/log');
+
 app.use(securityFilter);
 
 // Add CORS headers to request
