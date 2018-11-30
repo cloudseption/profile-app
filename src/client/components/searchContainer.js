@@ -18,7 +18,7 @@ class SearchContainer extends Component {
     handleGetProfile = searchParams => {
         axios
           .get(
-            `https://crowdseption-search-api.herokuapp.com/api/search?input=${searchParams}`
+            `/api/search?input=${searchParams}`
           )
           .then(res => {
             try {
