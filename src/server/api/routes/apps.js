@@ -16,6 +16,7 @@ router.get('/', (req, res, next) => {
                 displayName:       doc.displayName,
                 url:               doc.url,
                 badgeEndpoint:     doc.badgeEndpoint,
+                skillSearchEndpoint: doc.skillSearchEndpoint,
                 landingEndpoint:   doc.landingEndpoint,
                 appToken:          doc.appToken,
                 requiredResources: doc.requiredResources,
@@ -42,6 +43,7 @@ router.get('/:appId', (req, res, next) => {
             displayName:       doc.displayName,
             url:               doc.url,
             badgeEndpoint:     doc.badgeEndpoint,
+            skillSearchEndpoint: doc.skillSearchEndpoint,
             landingEndpoint:   doc.landingEndpoint,
             appToken:          doc.appToken,
             requiredResources: doc.requiredResources,
@@ -71,16 +73,17 @@ router.post('/', (req, res, next) => {
     .then(key => {
         console.log(key);
         return new App({
-            _id: new mongoose.Types.ObjectId(),
-            appId:                  req.body.appId,
-            displayName:            req.body.displayName,
-            url:                    req.body.url,
-            badgeEndpoint:          req.body.badgeEndpoint,
-            landingEndpoint:        req.body.landingEndpoint,
-            appToken:               req.body.appToken,
-            clientKey:              key.kid,
-            clientSecret:           key.k,
-            requiredResources:      req.body.requiredResources
+          _id: new mongoose.Types.ObjectId(),
+          appId: req.body.appId,
+          displayName: req.body.displayName,
+          url: req.body.url,
+          badgeEndpoint: req.body.badgeEndpoint,
+          skillSearchEndpoint: doc.skillSearchEndpoint,
+          landingEndpoint: req.body.landingEndpoint,
+          appToken: req.body.appToken,
+          clientKey: key.kid,
+          clientSecret: key.k,
+          requiredResources: req.body.requiredResources
         });
     })
     .then(newApp => {

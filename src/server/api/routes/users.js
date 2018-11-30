@@ -272,6 +272,7 @@ router.get('/:userId/badge-data', (req, res, next) => {
 });
 
 /**
+ * IN PROGRESS
  * Queries all attached apps and returns userId's for users that matches the search params.
  * Returns [] if none exist.
  */
@@ -283,6 +284,7 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
     App.find()
         .exec()
         .then(appsData => {
+            console.log(appsData);
             let returnedUserIds = [];
             appsData.forEach(async (appData) => {
                 let appId = appData.appId;
@@ -299,15 +301,17 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
             return Promise.all(returnedUserIds);
         })
         .then(responses => {
-            console.log('Joining responses');
-            let results = [];
-            responses.forEach(response => {
-                if (response) {
-                    results = results.concat(response);
-                }
-            });
-            res.status(200).json(results);
-        }) // Here we'll have a list of user ids. now return the users the same way Prab's search returns them.
+            // Flatten array of arrays of user ids from the external apps into single array
+            let merged = [].concat.apply([], responses);
+
+            let flattened = merged.concat.apply(merged, responses);
+            return (flattened);
+        })
+        .then(ids => { 
+            // TODO: create and return an array of user profiles here.
+            console.log('IDS!', ids);
+            res.status(200).json(ids);
+        })
         .catch(err => {
             console.log(err);
         })
@@ -369,7 +373,15 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
             'Authorization': appToken,
         }
     })
-    .then(res => res.data.skillSearchData)
+    // Filter response from external app endpoint to array of user ids... would be ideal if that was all it returned. 
+    .then(res => { 
+        let resultIds = [];
+        let reqResultData = res.data.user_scores;
+        for (result in reqResultData) {
+            resultIds.push(reqResultData[result].userId);
+        }
+        return resultIds;
+    })
     .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
@@ -434,7 +446,6 @@ router.patch('/:userId', (req, res, next) => {
     User.update({ userId: id }, { $set: updateOperations })
       .exec()
       .then(result => {
-        // console.log(result);
         res.status(200).json(result);
       })
       .catch(err => {
