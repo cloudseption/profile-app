@@ -388,8 +388,8 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
 /**
  * Requests badge page data from the given remote app's endpoint.
  */
-function getBadgeData(appId, skillSearchEndpoint, appToken, userId) {
-    return Axios.post(skillSearchEndpoint, {},
+function getBadgeData(appId, badgeEndpoint, appToken, userId) {
+    return Axios.post(badgeEndpoint, {},
         {
             headers: {
             'Authorization' : appToken,
