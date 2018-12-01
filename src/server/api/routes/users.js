@@ -394,7 +394,7 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
             'Authorization': appToken,
         }
     })
-    .then(res => res.data.user_scores) // Make sure external apps return 'user_scores' as well.
+    .then(res => res.data.data) // Make sure external apps return 'user_scores' as well.
     .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
