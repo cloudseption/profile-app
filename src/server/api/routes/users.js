@@ -287,6 +287,58 @@ router.get('/:userId/badge-data', (req, res, next) => {
 });
 
 /**
+ * Queries all attached apps and returns userId's 
+ * for users that matches the advanced search params.
+ * Returns [] if none exist.
+ */
+router.get('/:skill/:score/score-data', (req, res, next) => {
+    log.warn(`Getting userIds based on score data`);
+    const skill = req.params.skill;
+    const score = req.params.score;
+    App.find()
+        .exec()
+        .then(appsData => {
+            let returnedUserIds = [];
+            appsData.forEach(async (appData) => {
+                let appId = appData.appId;
+                let skillSearchEndpoint = appData.skillSearchEndpoint;
+                let appToken = appData.appToken;
+                if (skillSearchEndpoint) {
+                    returnedUserIds.push(
+                        getProfileIds(appId, skillSearchEndpoint, appToken, skill, score)
+                    );
+                }
+            });
+            return Promise.all(returnedUserIds);
+        })
+        .then(responses => {
+            // Flatten array of arrays of user ids
+            // from the external apps into single array
+            let merged = [].concat.apply([], responses);
+            return (merged);
+        })
+        .then(ids => {
+            User.find({ userId: { $in: ids } })
+                .exec()
+                .then(doc => {
+                    if (doc) {
+                        res.status(200).json(doc);
+                    } else {
+                        res.status(404).json({ message: 'No valid entry found for that user id' });
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({ error: err });
+                });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+});
+
+
+/**
  * Queries all attached apps and returns their landingData for the given user.
  */
 router.get('/:userId/landing-data', (req, res, next) => {
@@ -328,6 +380,24 @@ router.get('/:userId/landing-data', (req, res, next) => {
         console.log(err);
     })
 });
+
+/**
+ * Requests profile data from the given remote app's endpoint.
+ */
+function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
+    return Axios.post(searchEndpoint, {
+        skill: skill,
+        score: score
+    },
+    {
+        headers: {
+            'Authorization': appToken,
+        }
+    })
+    .then(res => res.data.user_scores) // Make sure external apps return 'user_scores' as well.
+    .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
+}
+
 
 /**
  * Requests badge page data from the given remote app's endpoint.
