@@ -272,8 +272,8 @@ router.get('/:userId/badge-data', (req, res, next) => {
 });
 
 /**
- * IN PROGRESS
- * Queries all attached apps and returns userId's for users that matches the search params.
+ * Queries all attached apps and returns userId's 
+ * for users that matches the advanced search params.
  * Returns [] if none exist.
  */
 router.get('/:skill/:score/score-data', (req, res, next) => {
@@ -284,7 +284,6 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
     App.find()
         .exec()
         .then(appsData => {
-            //console.log(appsData);
             let returnedUserIds = [];
             appsData.forEach(async (appData) => {
                 let appId = appData.appId;
@@ -301,32 +300,25 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
             return Promise.all(returnedUserIds);
         })
         .then(responses => {
-            //Flatten array of arrays of user ids from the external apps into single array
+            // Flatten array of arrays of user ids
+            // from the external apps into single array
             let merged = [].concat.apply([], responses);
             return (merged);
         })
         .then(ids => { 
-            // create and return an array of user profiles here.
-
-            let profileArray = [];
-            console.log('printing ids', ids);
-            for (id in ids) {
-                User.findOne({ userId: ids[id] })
-                    .exec()
-                    .then(doc => {
-                        if (doc) {
-                            //console.log("doc", doc);
-                            profileArray.push(doc);
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(500).json({ error: err });
-                    });
-            }
-            //console.log("PROFILE ARRAY", profileArray);
-            res.status(200).json(profileArray);
-            //res.status(200).json(ids);
+            User.find({ userId: { $in: ids } })
+                .exec()
+                .then(doc => {
+                    if (doc) {
+                        res.status(200).json(doc);
+                    } else {
+                        res.status(404).json({ message: 'No valid entry found for that user id' });
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({ error: err });
+                });
         })
         .catch(err => {
             console.log(err);
@@ -389,7 +381,7 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
             'Authorization': appToken,
         }
     })
-    .then(res => res.data.user_scores)
+    .then(res => res.data.user_scores) // Make sure external apps return 'user_scores' as well.
     .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
