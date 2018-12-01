@@ -131,6 +131,11 @@ router.post('/verify', (req, res, next) => {
         picture:        ''
     };
 
+    if (!userId) {
+        log.error(`API call /api/users/verify - no userId found (${userId})`);
+        res.status(500).json({ error: err });
+    }
+
     User.update({ email: email }, { $set: updateOperations })
     .exec()
     .then(() => {
@@ -145,8 +150,12 @@ router.post('/verify', (req, res, next) => {
                 `ROUTE:*:/api/permissions/*/${userId}`
             ]
         });
+
+        log.trace(`Writing default permissions for user ${userId} to access their own resources`);
     
-        return permissionSet.save();
+        return permissionSet.save().then(result => {
+            log.trace(result);
+        });
     })
     .then(() => {
         // Give the user their starting permissions
@@ -156,16 +165,22 @@ router.post('/verify', (req, res, next) => {
             resourceId:  'na',
             permissions: [
                 `ROUTE:*:/api/auth/token`,
+                `ROUTE:*:/api/users/${userId}/*`,
+                `ROUTE:*:/api/permissions/${userId}/*`,
+                `ROUTE:*:/api/permissions/*/${userId}`
             ]
         });
     
-        return permissionSet.save();
+        log.trace(`Writing default permissions for user ${userId} to access null resourceIds`);
+        return permissionSet.save().then(result => {
+            log.trace(result);
+        });;
     })
     .then(result => {
         res.status(200).json(result);
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         res.status(500).json({ error: err });
     });
 })
