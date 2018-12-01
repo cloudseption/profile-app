@@ -284,7 +284,7 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
     App.find()
         .exec()
         .then(appsData => {
-            console.log(appsData);
+            //console.log(appsData);
             let returnedUserIds = [];
             appsData.forEach(async (appData) => {
                 let appId = appData.appId;
@@ -301,16 +301,32 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
             return Promise.all(returnedUserIds);
         })
         .then(responses => {
-            // Flatten array of arrays of user ids from the external apps into single array
+            //Flatten array of arrays of user ids from the external apps into single array
             let merged = [].concat.apply([], responses);
-
-            let flattened = merged.concat.apply(merged, responses);
-            return (flattened);
+            return (merged);
         })
         .then(ids => { 
-            // TODO: create and return an array of user profiles here.
-            console.log('IDS!', ids);
-            res.status(200).json(ids);
+            // create and return an array of user profiles here.
+
+            let profileArray = [];
+            console.log('printing ids', ids);
+            for (id in ids) {
+                User.findOne({ userId: ids[id] })
+                    .exec()
+                    .then(doc => {
+                        if (doc) {
+                            //console.log("doc", doc);
+                            profileArray.push(doc);
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json({ error: err });
+                    });
+            }
+            //console.log("PROFILE ARRAY", profileArray);
+            res.status(200).json(profileArray);
+            //res.status(200).json(ids);
         })
         .catch(err => {
             console.log(err);
@@ -373,15 +389,7 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
             'Authorization': appToken,
         }
     })
-    // Filter response from external app endpoint to array of user ids... would be ideal if that was all it returned. 
-    .then(res => { 
-        let resultIds = [];
-        let reqResultData = res.data.user_scores;
-        for (result in reqResultData) {
-            resultIds.push(reqResultData[result].userId);
-        }
-        return resultIds;
-    })
+    .then(res => res.data.user_scores)
     .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
