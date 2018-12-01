@@ -58,6 +58,7 @@ securityFilter.registerPublicRoute('*:/api/users');
 securityFilter.registerPublicRoute('*:/api/users/*');
 securityFilter.registerPublicRoute('*:/api/users/*/by-obj-id');
 securityFilter.registerPublicRoute('*:/api/users/*/badge-data');
+securityFilter.registerPublicRoute("*:/api/users/*/*/score-data");
 securityFilter.registerPublicRoute('*:/api/users/pre-register');
 securityFilter.registerPublicRoute('*:/api/users/verify');
 securityFilter.registerPublicRoute('*:/api/auth/token');
