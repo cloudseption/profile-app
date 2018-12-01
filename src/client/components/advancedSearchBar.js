@@ -24,7 +24,7 @@ class AdvancedSearchBar extends Component {
         return (<form className="form-inline m-2" onSubmit={this.handleSubmit}>
             <select id="skill" className="multi" onChange={this.handleSkillChange} value={this.state.skill}>
                 <option value="java">Java</option>
-                <option value="javascipt">Javascript</option>
+                <option value="javascript">Javascript</option>
                 <option value="hangman">Hangman</option>
                 <option value="tankgame">Tank Game</option>
             </select>

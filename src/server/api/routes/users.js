@@ -315,6 +315,7 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
             // Flatten array of arrays of user ids
             // from the external apps into single array
             let merged = [].concat.apply([], responses);
+            console.log("MERGED", merged);
             return (merged);
         })
         .then(ids => {
@@ -394,7 +395,7 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
             'Authorization': appToken,
         }
     })
-    .then(res => res.data.data) // Make sure external apps return 'user_scores' as well.
+    .then(res => res.data.data) 
     .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
