@@ -61,6 +61,8 @@ securityFilter.registerPublicRoute('*:/api/users/*/badge-data');
 securityFilter.registerPublicRoute('*:/api/users/pre-register');
 securityFilter.registerPublicRoute('*:/api/users/verify');
 securityFilter.registerPublicRoute('*:/api/auth/token');
+securityFilter.registerPublicRoute('*:/api/search');
+securityFilter.registerPublicRoute('*:/api/search/&');
 
 // Webpage Requests
 securityFilter.registerPublicRoute('GET:/');
