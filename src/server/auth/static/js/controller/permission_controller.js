@@ -136,8 +136,7 @@ Controller.prototype = {
         //     redirect += '&' + grant_param;
         // }
 
-        console.log(redirect);
-        // window.location = redirect;
+        window.location = redirect;
     },
 
     handle_error: function(err) {
