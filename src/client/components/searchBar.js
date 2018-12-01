@@ -23,6 +23,7 @@ class SearchBar extends Component {
       <form className="form-inline m-2" onSubmit={this.handleSubmit}>
         <input
           className="form-control mr-sm-2"
+          id="searchInput"
           type="search"
           placeholder="Search"
           aria-label="Search"

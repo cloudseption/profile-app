@@ -12,14 +12,14 @@ router.get('/', (req, res, next) => {
         let sanitizedDocs = [];
         docs.forEach(doc => {
             sanitizedDocs.push({
-                appId:             doc.appId,
-                displayName:       doc.displayName,
-                url:               doc.url,
-                badgeEndpoint:     doc.badgeEndpoint,
+                appId:               doc.appId,
+                displayName:         doc.displayName,
+                url:                 doc.url,
+                badgeEndpoint:       doc.badgeEndpoint,
                 skillSearchEndpoint: doc.skillSearchEndpoint,
-                landingEndpoint:   doc.landingEndpoint,
-                appToken:          doc.appToken,
-                requiredResources: doc.requiredResources,
+                landingEndpoint:     doc.landingEndpoint,
+                appToken:            doc.appToken,
+                requiredResources:   doc.requiredResources,
             });
         });
         res.status(200).json(sanitizedDocs);
@@ -39,14 +39,14 @@ router.get('/:appId', (req, res, next) => {
             throw new Error(`${req.params.appId} not found`);
         }
         let sanitizedDoc = {
-            appId:             doc.appId,
-            displayName:       doc.displayName,
-            url:               doc.url,
-            badgeEndpoint:     doc.badgeEndpoint,
+            appId:               doc.appId,
+            displayName:         doc.displayName,
+            url:                 doc.url,
+            badgeEndpoint:       doc.badgeEndpoint,
             skillSearchEndpoint: doc.skillSearchEndpoint,
-            landingEndpoint:   doc.landingEndpoint,
-            appToken:          doc.appToken,
-            requiredResources: doc.requiredResources,
+            landingEndpoint:     doc.landingEndpoint,
+            appToken:            doc.appToken,
+            requiredResources:   doc.requiredResources,
         }
         res.status(200).json(sanitizedDoc);
     })
@@ -74,16 +74,16 @@ router.post('/', (req, res, next) => {
         console.log(key);
         return new App({
           _id: new mongoose.Types.ObjectId(),
-          appId: req.body.appId,
-          displayName: req.body.displayName,
-          url: req.body.url,
-          badgeEndpoint: req.body.badgeEndpoint,
-          skillSearchEndpoint: doc.skillSearchEndpoint,
-          landingEndpoint: req.body.landingEndpoint,
-          appToken: req.body.appToken,
-          clientKey: key.kid,
-          clientSecret: key.k,
-          requiredResources: req.body.requiredResources
+          appId:               req.body.appId,
+          displayName:         req.body.displayName,
+          url:                 req.body.url,
+          badgeEndpoint:       req.body.badgeEndpoint,
+          skillSearchEndpoint: req.body.skillSearchEndpoint,
+          landingEndpoint:     req.body.landingEndpoint,
+          appToken:            req.body.appToken,
+          clientKey:           key.kid,
+          clientSecret:        key.k,
+          requiredResources:   req.body.requiredResources
         });
     })
     .then(newApp => {
