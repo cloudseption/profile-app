@@ -9,6 +9,7 @@ import ProfilePicture from "./profilePicture";
 import './publicProfile.css';
 import iconEdit from '../icons/svg/pencil.svg';
 import iconSave from "../icons/svg/check.svg";
+import iconChat from "../icons/svg/chat.svg";
 
 
 class PublicProfile extends Component {
@@ -92,12 +93,28 @@ class PublicProfile extends Component {
   }
 
   render() {
+    let profileId;
+    try {
+      profileId = this.props.match.params.handle;
+    } catch (err) {
+      console.log(err);
+    }
+
     return <React.Fragment>
         <div className="card m-2 bg-dark">
           <div className="card-header banner_frame bg-dark text-white">
             <div className="row" align="center">
               <div className="col-12">
-                {this.state.currUser && <div align="right" className="col-sm-12">
+                <div align="right" className="col-sm-12">
+                {!this.state.currUser &&
+                  <a className="message-button" href={`http://cryptic-island-60821.herokuapp.com/?chat-with=${profileId}`}>
+                    <img style={{ width: "20px" }}
+                          src={iconChat}
+                          alt="Message"
+                        />
+                  </a>
+                }
+                {this.state.currUser &&
                     <button className="profile-edit-button" onClick={this.handleButton.bind(this)}>
                       {this.state.isEdit ? (
                         <img
@@ -113,7 +130,8 @@ class PublicProfile extends Component {
                         />
                       )}
                     </button>
-                  </div>}
+                  }
+                </div>
               </div>
             </div>
             <div className="row" align="center">
