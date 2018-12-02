@@ -23,6 +23,9 @@ const toolbar = props => (
             <a href="/search">Search</a>
           </li>
           <li>
+            <a href="http://cryptic-island-60821.herokuapp.com/">Messenger</a>
+          </li>
+          <li>
             <a href="/home">Landing Page</a>
           </li>
           {
