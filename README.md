@@ -1,20 +1,26 @@
 # Badgebook Profile CORE
 
-A full stack web application using React, Node.js, Express and Webpack. Configured with webpack-dev-server, eslint, prettier and babel.
-
+  - [Overview](#Overview)
   - [Quick Start](#quick-start)
     - [Development mode](#development-mode)
     - [Production mode](#production-mode)
-  - [Documentation](#documentation)
     - [Folder Structure](#folder-structure)
-    - [Babel](#babel)
-    - [ESLint](#eslint)
-    - [Webpack](#webpack)
-    - [Webpack dev server](#webpack-dev-server)
-    - [Nodemon](#nodemon)
-    - [Express](#express)
-    - [Concurrently](#concurrently)
-  - [Our APIs](./src/server/api/APIs.md)
+    - [Expected External APIs & Services](#Expected-External-APIs-&-Services)
+  - [Architecture](./documentation/architecture.md)
+  - [Deployment](./documentation/deployment.md)
+  - [Technologies](./documentation/technologies.md)
+
+
+## Overview
+
+This is the core application for our COMP 4711 project - a collection of applications inspired by social networks, built using a microservices architecture, which communicate using APIs.
+
+The core application has the following responsibilities:
+
+- Serve a web app where users can log in, create and edit profiles, and connect to the external applications.
+- Provide an API, which external applications can use to query user data.
+- Protect user information by requiring users to grant permissions to external applications before providing access to their information, and by requiring external applications to provide valid access tokens for all API requests.
+- Provide SSO (Single Sign-On) for external applications, allowing them to use one account across multiple applications.
 
 ## Quick Start
 
@@ -27,6 +33,19 @@ cd profile-app
 
 # Install dependencies
 npm install
+
+# Create a .env file in the root of the project (some of these you will have
+# to procure yourself - we're not putting access keys on github):
+
+MONGO_ATLAS_PASSWORD=<mongo-password>
+LOG_LEVEL=trace
+S3_BUCKET_NAME=<aws-s3-bucket-for-images>
+S3_IMAGE_PATH=public/images
+AWS_REGION=us-west-2
+AWS_ACCESS_KEY_ID=<required-for-image-upload>
+AWS_SECRET_ACCESS_KEY=<required-for-image-upload>
+SEARCH_ENDPOINT=https://crowdseption-search-api.herokuapp.com/api/search
+SEARCH_TOKEN=80b31-1626-41b5-b21b-b0e69a
 
 # Start development server
 npm run dev
@@ -48,83 +67,32 @@ Here, there are 2 servers running. The front end code will be served by the [web
 
 In the production mode, there is only 1 server. All the client side code is bundled into static files using webpack and be served by the Express application.
 
-## Documentation
-
 ### Folder Structure
 
-All the code is within the **src** directory. Inside src, there is client and server directory. All the frontend code is in client directory. Backend code is in the server directory.
+All the code is within the **src** directory. Inside src, there are three folders.
 
-### Babel
+- `Client` contains the React client-side code.
+- `Auth` contains client-side code for the authentication pages (this was adapted from an earlier app in the course, hence not being integrated as part of the React app).
+- `Server` contains all of the back-end server code, including MongoDB Schemas, Security Filter, and API routes.
 
-[Babel](https://babeljs.io/) helps us to write code in the latest version of JavaScript. If an environment does not support certain features natively, Babel will help us to compile those features down to a supported version. It also helps us to convert JSX to Javascript.
+### Expected External APIs & Services
 
-[.babelrc file](https://babeljs.io/docs/usage/babelrc/) is used describe the configurations required for Babel. Below is the .babelrc file which I am using.
+Our application is at least partially integrated with a few external services.
 
-```javascript
-{
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react"
-  ],
-  "plugins": [
-    "@babel/plugin-proposal-class-properties"
-  ]
-}
+#### Our Proprietary APIs
 
-```
+The core application consists of three separate apps:
 
-Babel requires plugins to do the transformation. Presets are the set of plugins defined by Babel. Preset **env** allows to use babel-preset-es2015, babel-preset-es2016, and babel-preset-es2017 and it will transform them to ES5. Preset **react** allows us to use JSX syntax and it will transform JSX to Javascript.
+1) The **core application** (this repo), which handles authenticating users, distributing access tokens, and presenting the profile and landing page functions.
+2) The [Search Server](https://github.com/cloudseption/search-api), which handles searching the user database. In our production environment, this is hosted on a separate Heroku dyno.
+3) The **BadgeBook Messenger** app, which is split into [client project](https://github.com/cloudseption/basic-firebase-chat) and [server project](https://github.com/cloudseption/basic-firebase-chat-server).
 
-### Webpack
+While the main application will work on its own, search and messenger functionality are dependent on the other two services.
 
-[Webpack](https://webpack.js.org/) is a module bundler. Its main purpose is to bundle JavaScript files for usage in a browser.
+#### External Services
 
-[webpack.config.js](https://webpack.js.org/configuration/) file is used to describe the configurations required for webpack.
+Our application is built using the following key third-party services:
 
-### Webpack dev server
-
-[Webpack dev server](https://webpack.js.org/configuration/dev-server/) is used along with webpack. It provides a development server that provides live reloading for the client side code. Quick development === 🔥 development
-
-The devServer section of webpack.config.js contains the configuration required to run webpack-dev-server, see below.
-
-```javascript
-devServer: {
-    port: 3000,
-    open: true,
-    proxy: {
-        "/api": "http://localhost:8080"
-    }
-}
-```
-
-[**Port**](https://webpack.js.org/configuration/dev-server/#devserver-port) specifies the Webpack dev server to listen on this particular port (3000). When [**open**](https://webpack.js.org/configuration/dev-server/#devserver-open) is set to true, it will automatically open the home page on startup. [Proxying](https://webpack.js.org/configuration/dev-server/#devserver-proxy) URLs can be useful when we have a separate API backend development server and we want to send API requests on the same domain. In our case, we have a Node.js/Express backend where we want to send the API requests to.
-
-### Nodemon
-
-Nodemon is a utility that will monitor for any changes in the server source code and it automatically restart the server. This is used in development only.
-
-nodemon.json file is used to describe the configurations for Nodemon. Below is the nodemon.json file which I am using.
-
-```javascript
-{
-  "watch": ["src/server/"]
-}
-```
-
-Here, we tell nodemon to watch the files in the directory src/server where out server side code resides. Nodemon will restart the node server whenever a file under src/server directory is modified.
-
-### Express
-
-Express is a web application framework for Node.js. It is used to build our backend API.
-
-src/server/index.js is the entry point to the server application.
-
-### Concurrently
-
-[Concurrently](https://github.com/kimmobrunfeldt/concurrently) is used to run multiple commands concurrently. I am using it to run the webpack dev server and the backend node server concurrently in the development environment. See npm commands below ⬇️.
-
-```javascript
-"client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
-"server": "nodemon src/server/index.js",
-"dev": "concurrently \"npm run server\" \"npm run client\""
-```
+- [AWS Cognito](https://aws.amazon.com/cognito/), which handles initial user authentication with the main application.
+- [AWS S3](https://aws.amazon.com/s3/), which is responsible for hosting the profile images, and which our application communicates with to handle profile image uploads. S3 is also part of our deployment process.
+- [MongoDB](https://www.mongodb.com/), which serves as our database. We use [Mongo Atlas](https://www.mongodb.com/cloud/atlas) for hosting and database management.
