@@ -31,7 +31,7 @@ router.get('/', (req, res, next) => {
         res.status(200).json(docs);
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         res.status(500).json({ error: err  });
     });
 });
@@ -60,7 +60,7 @@ router.post('/', (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         if (err.message) {
             err = err.message;
         }
@@ -108,7 +108,7 @@ router.post('/pre-register', (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         if (err.message) {
             err = err.message;
         }
@@ -212,7 +212,7 @@ router.post('/:userId', (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         if (err.message) {
             err = err.message;
         }
@@ -235,7 +235,7 @@ router.get('/:userId', (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         res.status(500).json({ error: err });
     });
 });
@@ -272,17 +272,28 @@ router.get('/:userId/badge-data', (req, res, next) => {
         return Promise.all(requestPromises);
     })
     .then(responses => {
-        console.log('Joining responses');
         let results = [];
         responses.forEach(response => {
             if (response) {
-                results = results.concat(response);
+                response.forEach(entry => {
+                    // Cheap error handling so the external apps don't have to change
+                    if (!entry.text) {
+                        entry.text = entry.data[0] || entry.name;
+                    }
+    
+                    if (!entry['icon-url']) {
+                        entry['icon-url'] = entry['img-url'];
+                    }
+
+                    results.push(entry);
+                })
+                
             }
         });
         res.status(200).json(results);
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
     })
 });
 
@@ -329,12 +340,12 @@ router.get('/:skill/:score/score-data', (req, res, next) => {
                     }
                 })
                 .catch(err => {
-                    console.log(err);
+                    log.error(err);
                     res.status(500).json({ error: err });
                 });
         })
         .catch(err => {
-            console.log(err);
+            log.error(err);
         })
 });
 
@@ -378,7 +389,7 @@ router.get('/:userId/landing-data', (req, res, next) => {
         res.status(200).json(results);
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
     })
 });
 
@@ -396,7 +407,7 @@ function getProfileIds(appId, searchEndpoint, appToken, skill, score) {
         }
     })
     .then(res => res.data.data) 
-    .catch(err => { console.log(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
+    .catch(err => { log.error(`Error hitting skill search endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
 
@@ -411,8 +422,11 @@ function getBadgeData(appId, badgeEndpoint, appToken, userId) {
             'userid' : userId
         }
     })
-    .then(res => res.data.badgeData)
-    .catch(err => { console.log(`Error hitting badge endpoint for ${appId}: ${err.message} - Skipping`); });
+    .then(res => {
+        log.info(`Badge data (${appId})\n`, `${badgeEndpoint}\n`, res.data);
+        return res.data.badgeData;
+    })
+    .catch(err => { log.error(`Error hitting badge endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
 /**
@@ -426,15 +440,17 @@ function getLandingData(appId, landingEndpoint, appToken, userId) {
             'userid' : userId
         }
     })
-    .then(res => res.data.landingData)
-    .catch(err => { console.log(`Error hitting landing endpoint for ${appId}: ${err.message} - Skipping`); });
+    .then(res => {
+        log.info(`getLandingData ${appId}: `, landingEndpoint, res.data);
+        return res.data.landingData
+    })
+    .catch(err => { log.error(`Error hitting landing endpoint for ${appId}: ${err.message} - Skipping`); });
 }
 
 /**
  * Checks if the user granted the given app permission.
  */
 function didUserAuthorizeApp(userId, appId, permission) {
-    console.log("didUserAuthorizeApp");
     return PermissionSet.findOne({ clientId: appId, resourceId: userId })
     .exec()
     .then(permissionSet => {
@@ -442,7 +458,7 @@ function didUserAuthorizeApp(userId, appId, permission) {
         return permissionResult;
     })
     .then(result => {
-        console.log('Permissions: ', result);
+        log.trace(`Permissions (${appId}): `, result);
         // return result;       // Uncomment this when ready to do actual permission checking
         return true;
     })
@@ -461,11 +477,10 @@ router.patch('/:userId', (req, res, next) => {
     User.update({ userId: id }, { $set: updateOperations })
       .exec()
       .then(result => {
-        // console.log(result);
         res.status(200).json(result);
       })
       .catch(err => {
-        console.log(err);
+        log.error(err);
         res.status(500).json({ error: err });
       });
 });
@@ -478,7 +493,7 @@ router.delete("/:userId", (req, res, next) => {
         res.status(200).json(result);
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         res.status(500).json({ error: err });
     });
 });
@@ -491,7 +506,7 @@ router.delete("/:userId/by-obj-id", (req, res, next) => {
         res.status(200).json(result);
     })
     .catch(err => {
-        console.log(err);
+        log.error(err);
         res.status(500).json({ error: err });
     });
 });

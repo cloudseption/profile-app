@@ -19,6 +19,11 @@
     border: none;
 }
 
+.message-button {
+    background: none;
+    border: none;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
     .card.m-2 {

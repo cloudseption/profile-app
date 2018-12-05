@@ -24,6 +24,7 @@ class SearchContainer extends Component {
     // Get profiles of all users in external apps matching search.
     const advSearchUrl = `${document.location.protocol}//${document.location.host}/api/users/${skill}/${score}/score-data`;
     axios.get(advSearchUrl).then(res => {
+      console.log(res);
       try {
         if (res && res.data) {
           // Need to determine where the list is based on the response. Response not yet known.
