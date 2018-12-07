@@ -1,0 +1,97 @@
+.toolbar {
+    width:100%;
+    position:fixed;
+    background: rgb(54, 57, 63);
+    top: 0;
+    left: 0;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+    height: 56px;
+    z-index: 10;
+}
+
+.toolbar-logo {
+    margin-left: 1rem;
+}
+
+.toolbar-navigation{ 
+    display:flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 1rem;
+}
+
+.toolbar-logo a {
+    color:white;
+    text-decoration: none;
+    font-size: 1.5rem;
+}
+
+.toolbar-logo a:hover {
+    text-decoration: none;
+    color:white;
+}
+
+.toolbar-navigation-items ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.toolbar-navigation-items li {
+    padding: 0 0.5rem;
+}
+
+.toolbar-navigation-items a {
+    color: white;
+    text-decoration: none;
+}
+
+/* Logout button */ 
+.toolbar-navigation-items a.logout {
+background-color: rgb(223, 91, 79);
+  box-shadow: 0 2px 0 rgb(124, 43, 43);
+  color: white;
+  padding: .5em 1em;
+  position: relative;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-radius: 5px;
+}
+
+.toolbar-navigation-items a.logout:hover {
+  background-color: rgb(196, 72, 60);
+  color:white;
+  cursor: pointer;
+}
+
+.toolbar-navigation-items a.logout:active {
+  box-shadow: none;
+  top: 2px;
+}
+
+.toolbar-navigation-items a:hover,
+.toolbar-navigation-items a:active {
+    color: #cacaca;
+    text-decoration: none;
+}
+
+.spacer {
+    flex:1;
+}
+
+@media (max-width: 768px) {
+    .toolbar-navigation-items {
+        display:none;
+    }
+}
+
+@media (min-width: 769px) {
+    .toolbar-toggle-button {
+        display: none;
+    }
+
+    .toolbar-logo {
+        margin-left: 0;;
+    }
+}

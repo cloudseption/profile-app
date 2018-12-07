@@ -14,6 +14,7 @@ A full stack web application using React, Node.js, Express and Webpack. Configur
     - [Nodemon](#nodemon)
     - [Express](#express)
     - [Concurrently](#concurrently)
+  - [Our APIs](./src/server/api/APIs.md)
 
 ## Quick Start
 
@@ -29,6 +30,8 @@ npm install
 
 # Start development server
 npm run dev
+
+STOP HERE IF YOU'RE A DEVELOPER, THE NEXT STEPS ARE FOR DEPLOYMENT
 
 # Build for production
 npm run build
